@@ -1,0 +1,16 @@
+{
+  "projectName": "ProperLang",
+  "languages": [{
+      "id": "properlang",
+      "grammar": "src/grammar.langium",
+      "fileExtensions": [".pl"],
+      "caseInsensitive": true,
+      "textMate": {
+          "out": "syntaxes/properlang.tmLanguage.json"
+      },
+      "monarch": {
+          "out": "./syntaxes/properlang.monarch.ts"
+      }
+  }],
+  "out": "src/generated/language-server"
+}

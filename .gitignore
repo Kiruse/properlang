@@ -1,0 +1,13 @@
+.cache/
+.DS_Store/
+dist/
+logs/
+node_modules/
+out/
+tmp/
+*.tgz
+*.log
+.env
+.env.*
+!.env.example
+*.tsbuildinfo

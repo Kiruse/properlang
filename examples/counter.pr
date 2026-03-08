@@ -1,0 +1,6 @@
+let counter = Math.random();
+
+for let i in 0..parseInt(process!.argv[0]):
+  counter++;
+
+console.log(`Counter: ${counter}`);

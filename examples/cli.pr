@@ -1,0 +1,2 @@
+unless '-s' in process?.argv or '--silent' in process?.argv:
+  console.log("Running from CLI");

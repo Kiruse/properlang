@@ -1,0 +1,47 @@
+{
+  "name": "properlang",
+  "scopeName": "source.properlang",
+  "fileTypes": [
+    ".pl"
+  ],
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "name": "keyword.control.properlang",
+      "match": "(?i)\\b(and|const|else|false|fn|for|if|in|instanceof|is|isnt|let|n|number|or|return|this|true|unless|while|xor)\\b|\\B(!in|!instanceof|!is)\\b"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "begin": "//",
+          "beginCaptures": {
+            "1": {
+              "name": "punctuation.whitespace.comment.leading.properlang"
+            }
+          },
+          "end": "(?=$)",
+          "name": "comment.line.properlang"
+        },
+        {
+          "name": "comment.block.properlang",
+          "begin": "/\\*",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.comment.properlang"
+            }
+          },
+          "end": "\\*/",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.comment.properlang"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
