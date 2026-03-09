@@ -76,6 +76,7 @@ src/
   index.ts              # Main entry point
   grammar.langium       # Grammar definition (EDIT THIS)
   parser.ts             # Factory for creating configured LangiumParser instances
+  parser.spec.ts        # Parser unit tests (template literals, interpolation, mode switching)
   generated/            # Auto-generated (DO NOT EDIT)
     language-server/
       ast.ts           # AST node definitions
@@ -94,10 +95,11 @@ syntaxes/
 
 ### Testing Guidelines
 - Use `bun test` framework
-- Test files: `*.test.ts` suffix
-- Import from `bun:test`: `import { test, expect } from "bun:test";`
+- Test files: `*.spec.ts` suffix
+- Import from `bun:test`: `import { describe, test, expect } from 'bun:test';`
 - Focus on grammar correctness and parser behavior
 - Test error cases and edge cases in language semantics
+- Parser tests (`src/parser.spec.ts`) cover template literals, interpolation, and mode switching
 
 ### Environment
 - Runtime: Bun (not Node.js)

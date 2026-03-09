@@ -19,7 +19,11 @@ hidden terminal LINE_COMMENT: '//' .*;
 hidden terminal BLOCK_COMMENT: '/*' .* '*/';
 terminal RELATION_OP: '<=' | '<' | '>=' | '>' | '==' | '!=';
 
-entry Program: stmts+=Stmt*;
+entry Program: stmts+=TopLevelStmt*;
+
+TopLevelStmt:
+    Stmt
+  | ImportDecl;
 
 Stmt:
     FnDecl
@@ -32,6 +36,14 @@ Stmt:
   | ReturnStmt
   ;
 
+ImportDecl:
+    'import' kwTypes='types' 'from' path=StringLit ';' // for type compatibility imports
+  | 'import' '*' 'as' name=ID 'from' path=StringLit ';'
+  | 'import' name=ID ',' '{' names+=ID* '}' 'from' path=StringLit ';'
+  | 'import' name=ID 'from' path=StringLit ';'
+  | 'import' '{' names+=ID* '}' 'from' path=StringLit ';'
+  | 'import' 'from' path=StringLit ';'
+  ;
 ReturnStmt: 'return' value=Expr?;
 
 IfExpr: kw=('if' | 'unless') condition=Expr ':'? consequent=Stmt ('else' ':'? alternate=Stmt)?;
@@ -53,28 +65,29 @@ PostfixExpr: operand=Accessor op=('++'|'--');
 PrimaryExpr:
     '(' expr=Expr ')'
   | value=Literal
-  | expr=CallExpr
   | expr=PrefixExpr
   | expr=PostfixExpr
   | expr=Accessor
   ;
 
-FnDecl: 'fn' name=ID '(' params+=Param* ')';
+FnDecl: doc=DOC_COMMENT? 'fn' name=ID '(' params+=Param* ')';
 Param: name=ID ':' constraint=Constraint;
-CallExpr: name=Accessor '(' args+=Expr* ')';
 
 VarDecl:
     kw='let' name=ID ':' constraint=Constraint
-  | kw=('let' | 'const') name=ID '=' value=Expr;
+  | kw=('let' | 'const') name=ID '=' value=Expr
+  | kw=('let' | 'const') '{' destruct+=DestructureDecl* '}' '=' value=Expr;
+DestructureDecl: name=ID (':' rename=ID)?;
 
 Accessor: id=(ID | 'this') members+=MemberAccessor*;
 MemberAccessor:
-    nullish=('?' | '!')? '.' prop=ID
-  | '[' index=Expr ']';
+    {infer MemberPropAccessor}  nullish=('?' | '!')? '.' prop=ID
+  | {infer MemberIndexAccessor} '[' index=Expr ']'
+  | {infer MemberCallAccessor}  '(' args+=Expr* ')';
 
 Literal: RangeLit | BigintLit | NumberLit | BoolLit | TemplateLit | StringLit;
 RangeLit: min=RangeBound op=('..' | '...') max=RangeBound;
-RangeBound: value=NUMBER | value=CallExpr | value=Accessor;
+RangeBound: value=NUMBER | value=Accessor;
 NumberLit: value=HEX | value=OCT | value=BIN | value=NUMBER;
 BigintLit: value=NUMBER 'n';
 BoolLit: value='true' | value='false';

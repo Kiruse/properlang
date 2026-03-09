@@ -19,6 +19,7 @@ export const ProperLangTerminals = {
     TPL_END: /\}(?:[^$\\]|\\.|\$(?!\{))*`/,
     TPL_BTWN: /\}(?:[^$\\]|\\.|\$(?!\{))*\$\{/,
     WS: /\s+/,
+    DOC_COMMENT: /\/\*\*(?:[\s\S])*\*\//,
     LINE_COMMENT: /\/\/(?:[\s\S])*/,
     BLOCK_COMMENT: /\/\*(?:[\s\S])*\*\//,
     RELATION_OP: /<=|<|>=|>|==|!=/,
@@ -40,6 +41,7 @@ export type ProperLangKeywordNames =
     | "**"
     | "+"
     | "++"
+    | ","
     | "-"
     | "--"
     | "."
@@ -58,12 +60,15 @@ export type ProperLangKeywordNames =
     | "["
     | "]"
     | "and"
+    | "as"
     | "const"
     | "else"
     | "false"
     | "fn"
     | "for"
+    | "from"
     | "if"
+    | "import"
     | "in"
     | "instanceof"
     | "is"
@@ -75,15 +80,18 @@ export type ProperLangKeywordNames =
     | "return"
     | "this"
     | "true"
+    | "types"
     | "unless"
     | "while"
     | "xor"
-    | "||";
+    | "{"
+    | "||"
+    | "}";
 
 export type ProperLangTokenNames = ProperLangTerminalNames | ProperLangKeywordNames;
 
 export interface Accessor extends langium.AstNode {
-    readonly $container: CallExpr | PostfixExpr | PrefixExpr | PrimaryExpr | RangeBound;
+    readonly $container: PostfixExpr | PrefixExpr | PrimaryExpr | RangeBound;
     readonly $type: 'Accessor';
     id: 'this' | string;
     members: Array<MemberAccessor>;
@@ -115,7 +123,7 @@ export function isBigintLit(item: unknown): item is BigintLit {
 }
 
 export interface BinaryExpr extends langium.AstNode {
-    readonly $container: CallExpr | ForStmt | IfExpr | MemberAccessor | PrefixExpr | PrimaryExpr | Program | ReturnStmt | TemplateLit | VarDecl | WhileStmt;
+    readonly $container: ForStmt | IfExpr | MemberCallAccessor | MemberIndexAccessor | PrefixExpr | PrimaryExpr | Program | ReturnStmt | TemplateLit | VarDecl | WhileStmt;
     readonly $type: 'BinaryExpr';
     left: PrimaryExpr;
     operator: '!=' | '!in' | '!instanceof' | '!is' | '%' | '&&' | '*' | '**' | '+' | '-' | '/' | '<' | '<=' | '==' | '>' | '>=' | 'and' | 'in' | 'instanceof' | 'is' | 'isnt' | 'or' | 'xor' | '||';
@@ -148,23 +156,6 @@ export function isBoolLit(item: unknown): item is BoolLit {
     return reflection.isInstance(item, BoolLit.$type);
 }
 
-export interface CallExpr extends langium.AstNode {
-    readonly $container: PrimaryExpr | RangeBound;
-    readonly $type: 'CallExpr';
-    args: Array<Expr>;
-    name: Accessor;
-}
-
-export const CallExpr = {
-    $type: 'CallExpr',
-    args: 'args',
-    name: 'name'
-} as const;
-
-export function isCallExpr(item: unknown): item is CallExpr {
-    return reflection.isInstance(item, CallExpr.$type);
-}
-
 export type Constraint = NumberConstraint;
 
 export const Constraint = {
@@ -173,6 +164,23 @@ export const Constraint = {
 
 export function isConstraint(item: unknown): item is Constraint {
     return reflection.isInstance(item, Constraint.$type);
+}
+
+export interface DestructureDecl extends langium.AstNode {
+    readonly $container: VarDecl;
+    readonly $type: 'DestructureDecl';
+    name: string;
+    rename?: string;
+}
+
+export const DestructureDecl = {
+    $type: 'DestructureDecl',
+    name: 'name',
+    rename: 'rename'
+} as const;
+
+export function isDestructureDecl(item: unknown): item is DestructureDecl {
+    return reflection.isInstance(item, DestructureDecl.$type);
 }
 
 export type Expr = BinaryExpr | PrimaryExpr;
@@ -188,12 +196,14 @@ export function isExpr(item: unknown): item is Expr {
 export interface FnDecl extends langium.AstNode {
     readonly $container: ForStmt | IfExpr | Program | WhileStmt;
     readonly $type: 'FnDecl';
+    doc?: string;
     name: string;
     params: Array<Param>;
 }
 
 export const FnDecl = {
     $type: 'FnDecl',
+    doc: 'doc',
     name: 'name',
     params: 'params'
 } as const;
@@ -242,6 +252,27 @@ export function isIfExpr(item: unknown): item is IfExpr {
     return reflection.isInstance(item, IfExpr.$type);
 }
 
+export interface ImportDecl extends langium.AstNode {
+    readonly $container: Program;
+    readonly $type: 'ImportDecl';
+    kwTypes?: 'types';
+    name?: string;
+    names: Array<string>;
+    path: StringLit;
+}
+
+export const ImportDecl = {
+    $type: 'ImportDecl',
+    kwTypes: 'kwTypes',
+    name: 'name',
+    names: 'names',
+    path: 'path'
+} as const;
+
+export function isImportDecl(item: unknown): item is ImportDecl {
+    return reflection.isInstance(item, ImportDecl.$type);
+}
+
 export type Literal = BigintLit | BoolLit | NumberLit | RangeLit | StringLit | TemplateLit;
 
 export const Literal = {
@@ -252,23 +283,61 @@ export function isLiteral(item: unknown): item is Literal {
     return reflection.isInstance(item, Literal.$type);
 }
 
-export interface MemberAccessor extends langium.AstNode {
-    readonly $container: Accessor;
-    readonly $type: 'MemberAccessor';
-    index?: Expr;
-    nullish?: '!' | '?';
-    prop?: string;
-}
+export type MemberAccessor = MemberCallAccessor | MemberIndexAccessor | MemberPropAccessor;
 
 export const MemberAccessor = {
-    $type: 'MemberAccessor',
-    index: 'index',
-    nullish: 'nullish',
-    prop: 'prop'
+    $type: 'MemberAccessor'
 } as const;
 
 export function isMemberAccessor(item: unknown): item is MemberAccessor {
     return reflection.isInstance(item, MemberAccessor.$type);
+}
+
+export interface MemberCallAccessor extends langium.AstNode {
+    readonly $container: Accessor;
+    readonly $type: 'MemberCallAccessor';
+    args: Array<Expr>;
+}
+
+export const MemberCallAccessor = {
+    $type: 'MemberCallAccessor',
+    args: 'args'
+} as const;
+
+export function isMemberCallAccessor(item: unknown): item is MemberCallAccessor {
+    return reflection.isInstance(item, MemberCallAccessor.$type);
+}
+
+export interface MemberIndexAccessor extends langium.AstNode {
+    readonly $container: Accessor;
+    readonly $type: 'MemberIndexAccessor';
+    index: Expr;
+}
+
+export const MemberIndexAccessor = {
+    $type: 'MemberIndexAccessor',
+    index: 'index'
+} as const;
+
+export function isMemberIndexAccessor(item: unknown): item is MemberIndexAccessor {
+    return reflection.isInstance(item, MemberIndexAccessor.$type);
+}
+
+export interface MemberPropAccessor extends langium.AstNode {
+    readonly $container: Accessor;
+    readonly $type: 'MemberPropAccessor';
+    nullish?: '!' | '?';
+    prop: string;
+}
+
+export const MemberPropAccessor = {
+    $type: 'MemberPropAccessor',
+    nullish: 'nullish',
+    prop: 'prop'
+} as const;
+
+export function isMemberPropAccessor(item: unknown): item is MemberPropAccessor {
+    return reflection.isInstance(item, MemberPropAccessor.$type);
 }
 
 export interface NumberConstraint extends langium.AstNode {
@@ -359,9 +428,9 @@ export function isPrefixExpr(item: unknown): item is PrefixExpr {
 }
 
 export interface PrimaryExpr extends langium.AstNode {
-    readonly $container: BinaryExpr | CallExpr | ForStmt | IfExpr | MemberAccessor | PrefixExpr | PrimaryExpr | Program | ReturnStmt | TemplateLit | VarDecl | WhileStmt;
+    readonly $container: BinaryExpr | ForStmt | IfExpr | MemberCallAccessor | MemberIndexAccessor | PrefixExpr | PrimaryExpr | Program | ReturnStmt | TemplateLit | VarDecl | WhileStmt;
     readonly $type: 'PrimaryExpr';
-    expr?: Accessor | CallExpr | Expr | PostfixExpr | PrefixExpr;
+    expr?: Accessor | Expr | PostfixExpr | PrefixExpr;
     value?: Literal;
 }
 
@@ -377,7 +446,7 @@ export function isPrimaryExpr(item: unknown): item is PrimaryExpr {
 
 export interface Program extends langium.AstNode {
     readonly $type: 'Program';
-    stmts: Array<Stmt>;
+    stmts: Array<TopLevelStmt>;
 }
 
 export const Program = {
@@ -392,7 +461,7 @@ export function isProgram(item: unknown): item is Program {
 export interface RangeBound extends langium.AstNode {
     readonly $container: RangeLit;
     readonly $type: 'RangeBound';
-    value: Accessor | CallExpr | string;
+    value: Accessor | string;
 }
 
 export const RangeBound = {
@@ -449,7 +518,7 @@ export function isStmt(item: unknown): item is Stmt {
 }
 
 export interface StringLit extends langium.AstNode {
-    readonly $container: ForStmt | IfExpr | PrimaryExpr | Program | WhileStmt;
+    readonly $container: ForStmt | IfExpr | ImportDecl | PrimaryExpr | Program | WhileStmt;
     readonly $type: 'StringLit';
     value: string;
 }
@@ -478,18 +547,30 @@ export function isTemplateLit(item: unknown): item is TemplateLit {
     return reflection.isInstance(item, TemplateLit.$type);
 }
 
+export type TopLevelStmt = ImportDecl | Stmt;
+
+export const TopLevelStmt = {
+    $type: 'TopLevelStmt'
+} as const;
+
+export function isTopLevelStmt(item: unknown): item is TopLevelStmt {
+    return reflection.isInstance(item, TopLevelStmt.$type);
+}
+
 export interface VarDecl extends langium.AstNode {
     readonly $container: ForStmt | IfExpr | Program | WhileStmt;
     readonly $type: 'VarDecl';
     constraint?: Constraint;
+    destruct: Array<DestructureDecl>;
     kw: 'const' | 'let';
-    name: string;
+    name?: string;
     value?: Expr;
 }
 
 export const VarDecl = {
     $type: 'VarDecl',
     constraint: 'constraint',
+    destruct: 'destruct',
     kw: 'kw',
     name: 'name',
     value: 'value'
@@ -521,14 +602,18 @@ export type ProperLangAstType = {
     BigintLit: BigintLit
     BinaryExpr: BinaryExpr
     BoolLit: BoolLit
-    CallExpr: CallExpr
     Constraint: Constraint
+    DestructureDecl: DestructureDecl
     Expr: Expr
     FnDecl: FnDecl
     ForStmt: ForStmt
     IfExpr: IfExpr
+    ImportDecl: ImportDecl
     Literal: Literal
     MemberAccessor: MemberAccessor
+    MemberCallAccessor: MemberCallAccessor
+    MemberIndexAccessor: MemberIndexAccessor
+    MemberPropAccessor: MemberPropAccessor
     NumberConstraint: NumberConstraint
     NumberLit: NumberLit
     Param: Param
@@ -542,6 +627,7 @@ export type ProperLangAstType = {
     Stmt: Stmt
     StringLit: StringLit
     TemplateLit: TemplateLit
+    TopLevelStmt: TopLevelStmt
     VarDecl: VarDecl
     WhileStmt: WhileStmt
 }
@@ -594,22 +680,21 @@ export class ProperLangAstReflection extends langium.AbstractAstReflection {
             },
             superTypes: [Literal.$type]
         },
-        CallExpr: {
-            name: CallExpr.$type,
-            properties: {
-                args: {
-                    name: CallExpr.args,
-                    defaultValue: []
-                },
-                name: {
-                    name: CallExpr.name
-                }
-            },
-            superTypes: []
-        },
         Constraint: {
             name: Constraint.$type,
             properties: {
+            },
+            superTypes: []
+        },
+        DestructureDecl: {
+            name: DestructureDecl.$type,
+            properties: {
+                name: {
+                    name: DestructureDecl.name
+                },
+                rename: {
+                    name: DestructureDecl.rename
+                }
             },
             superTypes: []
         },
@@ -622,6 +707,9 @@ export class ProperLangAstReflection extends langium.AbstractAstReflection {
         FnDecl: {
             name: FnDecl.$type,
             properties: {
+                doc: {
+                    name: FnDecl.doc
+                },
                 name: {
                     name: FnDecl.name
                 },
@@ -665,6 +753,25 @@ export class ProperLangAstReflection extends langium.AbstractAstReflection {
             },
             superTypes: [Stmt.$type]
         },
+        ImportDecl: {
+            name: ImportDecl.$type,
+            properties: {
+                kwTypes: {
+                    name: ImportDecl.kwTypes
+                },
+                name: {
+                    name: ImportDecl.name
+                },
+                names: {
+                    name: ImportDecl.names,
+                    defaultValue: []
+                },
+                path: {
+                    name: ImportDecl.path
+                }
+            },
+            superTypes: [TopLevelStmt.$type]
+        },
         Literal: {
             name: Literal.$type,
             properties: {
@@ -674,17 +781,39 @@ export class ProperLangAstReflection extends langium.AbstractAstReflection {
         MemberAccessor: {
             name: MemberAccessor.$type,
             properties: {
-                index: {
-                    name: MemberAccessor.index
-                },
-                nullish: {
-                    name: MemberAccessor.nullish
-                },
-                prop: {
-                    name: MemberAccessor.prop
-                }
             },
             superTypes: []
+        },
+        MemberCallAccessor: {
+            name: MemberCallAccessor.$type,
+            properties: {
+                args: {
+                    name: MemberCallAccessor.args,
+                    defaultValue: []
+                }
+            },
+            superTypes: [MemberAccessor.$type]
+        },
+        MemberIndexAccessor: {
+            name: MemberIndexAccessor.$type,
+            properties: {
+                index: {
+                    name: MemberIndexAccessor.index
+                }
+            },
+            superTypes: [MemberAccessor.$type]
+        },
+        MemberPropAccessor: {
+            name: MemberPropAccessor.$type,
+            properties: {
+                nullish: {
+                    name: MemberPropAccessor.nullish
+                },
+                prop: {
+                    name: MemberPropAccessor.prop
+                }
+            },
+            superTypes: [MemberAccessor.$type]
         },
         NumberConstraint: {
             name: NumberConstraint.$type,
@@ -808,7 +937,7 @@ export class ProperLangAstReflection extends langium.AbstractAstReflection {
             name: Stmt.$type,
             properties: {
             },
-            superTypes: []
+            superTypes: [TopLevelStmt.$type]
         },
         StringLit: {
             name: StringLit.$type,
@@ -829,11 +958,21 @@ export class ProperLangAstReflection extends langium.AbstractAstReflection {
             },
             superTypes: [Literal.$type]
         },
+        TopLevelStmt: {
+            name: TopLevelStmt.$type,
+            properties: {
+            },
+            superTypes: []
+        },
         VarDecl: {
             name: VarDecl.$type,
             properties: {
                 constraint: {
                     name: VarDecl.constraint
+                },
+                destruct: {
+                    name: VarDecl.destruct,
+                    defaultValue: []
                 },
                 kw: {
                     name: VarDecl.kw

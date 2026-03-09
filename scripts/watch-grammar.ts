@@ -10,11 +10,19 @@ const regen = debounce(async () => {
   console.log('Grammar changed, regenerating parser...');
   await $`langium generate`;
   console.log('Parser regenerated.');
-  await $`bun run ${import.meta.dirname}/parse-examples.ts`;
+  reparse();
 });
 
 const reparse = debounce(async () => {
-  await $`bun run ${import.meta.dirname}/parse-examples.ts`;
+  try {
+    await $`bun run ${import.meta.dirname}/parse-examples.ts`;
+  } catch (error: any) {
+    if (error.stderr) {
+      console.error('Parsing examples failed, see above');
+    } else {
+      console.error('Parsing examples failed:', error);
+    }
+  }
 });
 
 watch(grammarPath).on('change', regen);

@@ -12,32 +12,46 @@ function buildMultiModeTokens(): { multiMode: IMultiModeLexerDefinition; allToke
   const grammar = ProperLangGrammar();
   const tokenBuilder = new DefaultTokenBuilder();
   const tokens = tokenBuilder.buildTokens(grammar, { caseInsensitive: ProperLangLanguageMetaData.caseInsensitive }) as TokenType[];
-  
+
   const defaultTokens: TokenType[] = [];
   const interpolationTokens: TokenType[] = [];
   const tokenDict: Record<string, TokenType> = {};
-  
+
+  let tplEnd: TokenType | undefined;
+  let tplBtwn: TokenType | undefined;
+  let closeBrace: TokenType | undefined;
+
   for (const token of tokens) {
     tokenDict[token.name] = token;
-    
+
     if (token.name === 'TPL_START') {
       const tplStart = { ...token, PUSH_MODE: INTERPOLATION_MODE };
       defaultTokens.push(tplStart);
       tokenDict[token.name] = tplStart;
     } else if (token.name === 'TPL_END') {
-      const tplEnd = { ...token, POP_MODE: true };
-      interpolationTokens.push(tplEnd);
+      tplEnd = { ...token, POP_MODE: true, LONGER_ALT: undefined };
       tokenDict[token.name] = tplEnd;
     } else if (token.name === 'TPL_BTWN') {
-      interpolationTokens.push(token);
+      tplBtwn = { ...token, LONGER_ALT: undefined };
+      tokenDict[token.name] = tplBtwn;
     } else if (token.name === 'TPL_FULL') {
       defaultTokens.push(token);
+    } else if (token.name === '}') {
+      closeBrace = { ...token, LONGER_ALT: undefined };
+      tokenDict[token.name] = closeBrace;
     } else {
       defaultTokens.push(token);
       interpolationTokens.push(token);
     }
   }
-  
+
+  if (tplEnd) interpolationTokens.push(tplEnd);
+  if (tplBtwn) interpolationTokens.push(tplBtwn);
+  if (closeBrace) {
+    defaultTokens.push(closeBrace);
+    interpolationTokens.push(closeBrace);
+  }
+
   const multiMode: IMultiModeLexerDefinition = {
     modes: {
       defaultMode: defaultTokens,
@@ -45,14 +59,14 @@ function buildMultiModeTokens(): { multiMode: IMultiModeLexerDefinition; allToke
     },
     defaultMode: 'defaultMode'
   };
-  
+
   return { multiMode, allTokens: tokens, tokenDict };
 }
 
 class MultiModeLexer {
   private readonly chevrotainLexer: Lexer;
   private readonly tokenTypes: Record<string, TokenType>;
-  
+
   constructor(multiModeDef: IMultiModeLexerDefinition, tokenDict: Record<string, TokenType>) {
     this.chevrotainLexer = new Lexer(multiModeDef, {
       positionTracking: 'full',
@@ -60,16 +74,16 @@ class MultiModeLexer {
     });
     this.tokenTypes = tokenDict;
   }
-  
+
   get definition(): Record<string, TokenType> {
     return this.tokenTypes;
   }
-  
+
   tokenize(text: string): LexerResult {
     const result = this.chevrotainLexer.tokenize(text);
     const hidden: IToken[] = [];
     const tokens: IToken[] = [];
-    
+
     for (const token of result.tokens) {
       const tokenType = token.tokenType as TokenType;
       if (tokenType.GROUP === 'hidden' || tokenType.GROUP === Lexer.SKIPPED) {
@@ -78,7 +92,7 @@ class MultiModeLexer {
         tokens.push(token);
       }
     }
-    
+
     return {
       tokens,
       hidden,

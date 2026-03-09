@@ -1,12 +1,12 @@
 // Monarch syntax highlighting for the properlang language.
 export default {
     keywords: [
-        '!in','!instanceof','!is','and','const','else','false','fn','for','if','in','instanceof','is','isnt','let','n','number','or','return','this','true','unless','while','xor'
+        '!in','!instanceof','!is','and','as','const','else','false','fn','for','from','if','import','in','instanceof','is','isnt','let','n','number','or','return','this','true','types','unless','while','xor'
     ],
     operators: [
-        '!','!=','%','&&','*','**','+','++','-','--','.','..','...','/',':',';','<','<=','=','==','>','>=','?','||'
+        '!','!=','%','&&','*','**','+','++',',','-','--','.','..','...','/',':',';','<','<=','=','==','>','>=','?','||'
     ],
-    symbols: /!|!=|%|&&|\(|\)|\*|\*\*|\+|\+\+|-|--|\.|\.\.|\.\.\.|\/|:|;|<|<=|=|==|>|>=|\?|\[|\]|\|\|/,
+    symbols: /!|!=|%|&&|\(|\)|\*|\*\*|\+|\+\+|,|-|--|\.|\.\.|\.\.\.|\/|:|;|<|<=|=|==|>|>=|\?|\[|\]|\{|\|\||\}/,
 
     tokenizer: {
         initial: [

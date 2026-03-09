@@ -1,2 +1,11 @@
-unless '-s' in process?.argv or '--silent' in process?.argv:
-  console.log("Running from CLI");
+import { program } from 'commander';
+
+program
+  .options('-s, --silent')
+  .parse();
+
+const { silent } = program.opts();
+
+unless silent:
+  console.log('Hello, world!');
+console.log('oki');
