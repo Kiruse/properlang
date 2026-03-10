@@ -80,13 +80,16 @@ PrimaryExpr:
   ;
 
 FnDecl: doc=DOC_COMMENT? 'fn' name=ID '(' params+=Param* ')' ':'? body=(ExprStmt | Block);
-Param: name=ID (':' constraint=Constraint)?;
+Param:
+    {infer DestructureParam} '{' (destruct+=DestructureDecl (',' destruct+=DestructureDecl)*)? '}'
+  | {infer RestParam} '...' name=ID (':' constraint=Constraint)?
+  | name=ID (':' constraint=Constraint)?;
 
 VarDecl:
     kw='let' name=ID ':' constraint=Constraint ';'
   | kw=('let' | 'const') name=ID '=' value=Expr ';'
   | kw=('let' | 'const') '{' (destruct+=DestructureDecl (',' destruct+=DestructureDecl)*)? '}' '=' value=Expr ';';
-DestructureDecl: name=ID (':' rename=ID)?;
+DestructureDecl: name=ID ('as' rename=ID)? (':' constraint=Constraint)?;
 
 Accessor: id=(ID | 'this') members+=MemberAccessor*;
 MemberAccessor:
@@ -107,9 +110,14 @@ TemplateLit:
     (vals+=TPL_BTWN vals+=Expr)*
     vals+=TPL_END;
 
-Constraint: NumberConstraint;
-NumberConstraint:
-    'number' op=('<' | '<=' | '>' | '>=' | '!=') ref=NUMBER
-  | min=NUMBER op=('<' | '<=') 'number' ('<' | '<=') max=NUMBER
-  | max=NUMBER op=('>' | '>=') 'number' ('>' | '>=') min=NUMBER
-  | 'number';
+Constraint:
+    BinaryConstraint
+  | TypeName;
+TypeName: name=ID; // built-in types + user-defined aliases
+infix BinaryConstraint on PrimaryConstraint:
+    '<=' | '<' | '>' | '>='
+  > '!=';
+PrimaryConstraint:
+    {infer ArrayConstraint} TypeName '[' ']'
+  | TypeName
+  | Literal;

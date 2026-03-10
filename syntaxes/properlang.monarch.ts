@@ -1,7 +1,7 @@
 // Monarch syntax highlighting for the properlang language.
 export default {
     keywords: [
-        '!in','!instanceof','!is','and','as','const','else','false','fn','for','from','if','import','in','instanceof','is','isnt','let','n','new','number','or','return','this','true','types','unless','while','xor'
+        '!in','!instanceof','!is','and','as','const','else','false','fn','for','from','if','import','in','instanceof','is','isnt','let','n','new','or','return','this','true','types','unless','while','xor'
     ],
     operators: [
         '!','!=','%','%=','&&','*','**','*=','+','++','+=',',','-','--','-=','.','..','...','/','/=',':',';','<','<=','=','==','=>','>','>=','?','?=','||'

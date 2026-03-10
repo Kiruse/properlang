@@ -1760,41 +1760,156 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
       "$type": "ParserRule",
       "name": "Param",
       "definition": {
-        "$type": "Group",
+        "$type": "Alternatives",
         "elements": [
           {
-            "$type": "Assignment",
-            "feature": "name",
-            "operator": "=",
-            "terminal": {
-              "$type": "RuleCall",
-              "rule": {
-                "$ref": "#/rules@0"
+            "$type": "Group",
+            "elements": [
+              {
+                "$type": "Action",
+                "inferredType": {
+                  "$type": "InferredType",
+                  "name": "DestructureParam"
+                }
               },
-              "arguments": []
-            }
+              {
+                "$type": "Keyword",
+                "value": "{"
+              },
+              {
+                "$type": "Group",
+                "elements": [
+                  {
+                    "$type": "Assignment",
+                    "feature": "destruct",
+                    "operator": "+=",
+                    "terminal": {
+                      "$type": "RuleCall",
+                      "rule": {
+                        "$ref": "#/rules@34"
+                      },
+                      "arguments": []
+                    }
+                  },
+                  {
+                    "$type": "Group",
+                    "elements": [
+                      {
+                        "$type": "Keyword",
+                        "value": ","
+                      },
+                      {
+                        "$type": "Assignment",
+                        "feature": "destruct",
+                        "operator": "+=",
+                        "terminal": {
+                          "$type": "RuleCall",
+                          "rule": {
+                            "$ref": "#/rules@34"
+                          },
+                          "arguments": []
+                        }
+                      }
+                    ],
+                    "cardinality": "*"
+                  }
+                ],
+                "cardinality": "?"
+              },
+              {
+                "$type": "Keyword",
+                "value": "}"
+              }
+            ]
           },
           {
             "$type": "Group",
             "elements": [
               {
+                "$type": "Action",
+                "inferredType": {
+                  "$type": "InferredType",
+                  "name": "RestParam"
+                }
+              },
+              {
                 "$type": "Keyword",
-                "value": ":"
+                "value": "..."
               },
               {
                 "$type": "Assignment",
-                "feature": "constraint",
+                "feature": "name",
                 "operator": "=",
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@45"
+                    "$ref": "#/rules@0"
                   },
                   "arguments": []
                 }
+              },
+              {
+                "$type": "Group",
+                "elements": [
+                  {
+                    "$type": "Keyword",
+                    "value": ":"
+                  },
+                  {
+                    "$type": "Assignment",
+                    "feature": "constraint",
+                    "operator": "=",
+                    "terminal": {
+                      "$type": "RuleCall",
+                      "rule": {
+                        "$ref": "#/rules@45"
+                      },
+                      "arguments": []
+                    }
+                  }
+                ],
+                "cardinality": "?"
               }
-            ],
-            "cardinality": "?"
+            ]
+          },
+          {
+            "$type": "Group",
+            "elements": [
+              {
+                "$type": "Assignment",
+                "feature": "name",
+                "operator": "=",
+                "terminal": {
+                  "$type": "RuleCall",
+                  "rule": {
+                    "$ref": "#/rules@0"
+                  },
+                  "arguments": []
+                }
+              },
+              {
+                "$type": "Group",
+                "elements": [
+                  {
+                    "$type": "Keyword",
+                    "value": ":"
+                  },
+                  {
+                    "$type": "Assignment",
+                    "feature": "constraint",
+                    "operator": "=",
+                    "terminal": {
+                      "$type": "RuleCall",
+                      "rule": {
+                        "$ref": "#/rules@45"
+                      },
+                      "arguments": []
+                    }
+                  }
+                ],
+                "cardinality": "?"
+              }
+            ]
           }
         ]
       },
@@ -2029,7 +2144,7 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
             "elements": [
               {
                 "$type": "Keyword",
-                "value": ":"
+                "value": "as"
               },
               {
                 "$type": "Assignment",
@@ -2039,6 +2154,28 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
                   "$type": "RuleCall",
                   "rule": {
                     "$ref": "#/rules@0"
+                  },
+                  "arguments": []
+                }
+              }
+            ],
+            "cardinality": "?"
+          },
+          {
+            "$type": "Group",
+            "elements": [
+              {
+                "$type": "Keyword",
+                "value": ":"
+              },
+              {
+                "$type": "Assignment",
+                "feature": "constraint",
+                "operator": "=",
+                "terminal": {
+                  "$type": "RuleCall",
+                  "rule": {
+                    "$ref": "#/rules@45"
                   },
                   "arguments": []
                 }
@@ -2679,11 +2816,23 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
       "$type": "ParserRule",
       "name": "Constraint",
       "definition": {
-        "$type": "RuleCall",
-        "rule": {
-          "$ref": "#/rules@46"
-        },
-        "arguments": []
+        "$type": "Alternatives",
+        "elements": [
+          {
+            "$type": "RuleCall",
+            "rule": {
+              "$ref": "#/rules@47"
+            },
+            "arguments": []
+          },
+          {
+            "$type": "RuleCall",
+            "rule": {
+              "$ref": "#/rules@46"
+            },
+            "arguments": []
+          }
+        ]
       },
       "entry": false,
       "fragment": false,
@@ -2691,7 +2840,73 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
     },
     {
       "$type": "ParserRule",
-      "name": "NumberConstraint",
+      "name": "TypeName",
+      "definition": {
+        "$type": "Assignment",
+        "feature": "name",
+        "operator": "=",
+        "terminal": {
+          "$type": "RuleCall",
+          "rule": {
+            "$ref": "#/rules@0"
+          },
+          "arguments": []
+        }
+      },
+      "entry": false,
+      "fragment": false,
+      "parameters": []
+    },
+    {
+      "$type": "InfixRule",
+      "name": "BinaryConstraint",
+      "call": {
+        "$type": "RuleCall",
+        "rule": {
+          "$ref": "#/rules@48"
+        },
+        "arguments": []
+      },
+      "operators": {
+        "$type": "InfixRuleOperators",
+        "precedences": [
+          {
+            "$type": "InfixRuleOperatorList",
+            "operators": [
+              {
+                "$type": "Keyword",
+                "value": "<="
+              },
+              {
+                "$type": "Keyword",
+                "value": "<"
+              },
+              {
+                "$type": "Keyword",
+                "value": ">"
+              },
+              {
+                "$type": "Keyword",
+                "value": ">="
+              }
+            ]
+          },
+          {
+            "$type": "InfixRuleOperatorList",
+            "operators": [
+              {
+                "$type": "Keyword",
+                "value": "!="
+              }
+            ]
+          }
+        ]
+      },
+      "parameters": []
+    },
+    {
+      "$type": "ParserRule",
+      "name": "PrimaryConstraint",
       "definition": {
         "$type": "Alternatives",
         "elements": [
@@ -2699,184 +2914,42 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
             "$type": "Group",
             "elements": [
               {
+                "$type": "Action",
+                "inferredType": {
+                  "$type": "InferredType",
+                  "name": "ArrayConstraint"
+                }
+              },
+              {
+                "$type": "RuleCall",
+                "rule": {
+                  "$ref": "#/rules@46"
+                },
+                "arguments": []
+              },
+              {
                 "$type": "Keyword",
-                "value": "number"
+                "value": "["
               },
               {
-                "$type": "Assignment",
-                "feature": "op",
-                "operator": "=",
-                "terminal": {
-                  "$type": "Alternatives",
-                  "elements": [
-                    {
-                      "$type": "Keyword",
-                      "value": "<"
-                    },
-                    {
-                      "$type": "Keyword",
-                      "value": "<="
-                    },
-                    {
-                      "$type": "Keyword",
-                      "value": ">"
-                    },
-                    {
-                      "$type": "Keyword",
-                      "value": ">="
-                    },
-                    {
-                      "$type": "Keyword",
-                      "value": "!="
-                    }
-                  ]
-                }
-              },
-              {
-                "$type": "Assignment",
-                "feature": "ref",
-                "operator": "=",
-                "terminal": {
-                  "$type": "RuleCall",
-                  "rule": {
-                    "$ref": "#/rules@1"
-                  },
-                  "arguments": []
-                }
+                "$type": "Keyword",
+                "value": "]"
               }
             ]
           },
           {
-            "$type": "Group",
-            "elements": [
-              {
-                "$type": "Assignment",
-                "feature": "min",
-                "operator": "=",
-                "terminal": {
-                  "$type": "RuleCall",
-                  "rule": {
-                    "$ref": "#/rules@1"
-                  },
-                  "arguments": []
-                }
-              },
-              {
-                "$type": "Assignment",
-                "feature": "op",
-                "operator": "=",
-                "terminal": {
-                  "$type": "Alternatives",
-                  "elements": [
-                    {
-                      "$type": "Keyword",
-                      "value": "<"
-                    },
-                    {
-                      "$type": "Keyword",
-                      "value": "<="
-                    }
-                  ]
-                }
-              },
-              {
-                "$type": "Keyword",
-                "value": "number"
-              },
-              {
-                "$type": "Alternatives",
-                "elements": [
-                  {
-                    "$type": "Keyword",
-                    "value": "<"
-                  },
-                  {
-                    "$type": "Keyword",
-                    "value": "<="
-                  }
-                ]
-              },
-              {
-                "$type": "Assignment",
-                "feature": "max",
-                "operator": "=",
-                "terminal": {
-                  "$type": "RuleCall",
-                  "rule": {
-                    "$ref": "#/rules@1"
-                  },
-                  "arguments": []
-                }
-              }
-            ]
+            "$type": "RuleCall",
+            "rule": {
+              "$ref": "#/rules@46"
+            },
+            "arguments": []
           },
           {
-            "$type": "Group",
-            "elements": [
-              {
-                "$type": "Assignment",
-                "feature": "max",
-                "operator": "=",
-                "terminal": {
-                  "$type": "RuleCall",
-                  "rule": {
-                    "$ref": "#/rules@1"
-                  },
-                  "arguments": []
-                }
-              },
-              {
-                "$type": "Assignment",
-                "feature": "op",
-                "operator": "=",
-                "terminal": {
-                  "$type": "Alternatives",
-                  "elements": [
-                    {
-                      "$type": "Keyword",
-                      "value": ">"
-                    },
-                    {
-                      "$type": "Keyword",
-                      "value": ">="
-                    }
-                  ]
-                }
-              },
-              {
-                "$type": "Keyword",
-                "value": "number"
-              },
-              {
-                "$type": "Alternatives",
-                "elements": [
-                  {
-                    "$type": "Keyword",
-                    "value": ">"
-                  },
-                  {
-                    "$type": "Keyword",
-                    "value": ">="
-                  }
-                ]
-              },
-              {
-                "$type": "Assignment",
-                "feature": "min",
-                "operator": "=",
-                "terminal": {
-                  "$type": "RuleCall",
-                  "rule": {
-                    "$ref": "#/rules@1"
-                  },
-                  "arguments": []
-                }
-              }
-            ]
-          },
-          {
-            "$type": "Keyword",
-            "value": "number"
+            "$type": "RuleCall",
+            "rule": {
+              "$ref": "#/rules@37"
+            },
+            "arguments": []
           }
         ]
       },

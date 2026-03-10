@@ -7,8 +7,7 @@ program
   .command('bump')
   .option('-s, --silent')
   .option('--amount <value>', 'Amount to bump by', 1)
-  .action((options) => {
-    const { amount, silent } = options;
+  .action(({ amount, silent }) => {
     let doc = JSON.parse(fs.readFile('data/counter.json').await);
     doc.value += amount;
     fs.writeFile('data/counter.json').await;

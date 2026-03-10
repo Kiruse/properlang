@@ -140,3 +140,9 @@ let x: number < 100;
 let y: 0 < number < 100;
 let z: number >= 0;
 ```
+
+Numeric literals are valid as constraint operands in function parameters and type annotations:
+```properlang
+fn clamp(value: number < 5) { ... }
+fn bounded(x: 0 < number < 10) { ... }
+```

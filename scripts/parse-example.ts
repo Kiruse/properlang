@@ -1,5 +1,6 @@
+import * as YAML from 'yaml';
 import { createProperLangParser } from '../src/parser.js';
-import { stringifySafe } from '../src/utils.js';
+import { marshalAST } from '../src/utils.js';
 
 async function main() {
   const exampleName = process.argv[2];
@@ -35,7 +36,7 @@ async function main() {
       process.exit(1);
     }
 
-    console.log(`AST: ${stringifySafe(result.value)}`);
+    console.log(`AST: ${YAML.stringify(marshalAST(result.value))}`);
   } catch (error: any) {
     console.error(`Failed to parse ${fileName}: ${error.message}`);
     console.error(error.stack);

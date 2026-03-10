@@ -1,44 +1,26 @@
-export function stringifySafe(obj: any): string {
+export function marshalAST(obj: unknown): unknown {
   const seen = new WeakSet();
 
-  function format(value: any): string {
-    if (value === null) return 'null';
-    if (value === undefined) return 'undefined';
-    if (typeof value === 'string') return JSON.stringify(value);
-    if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+  function transform(value: unknown): unknown {
+    if (value === null || value === undefined) return value;
+    if (typeof value !== 'object') return value;
 
-    if (typeof value === 'object') {
-      if (seen.has(value)) return '"[cyclic ref]"';
-      seen.add(value);
+    if (seen.has(value)) return '[cyclic]';
+    seen.add(value);
 
-      if (Array.isArray(value)) {
-        const items = value.map(v => format(v));
-        seen.delete(value);
-        if (items.length === 0) return '[]';
-        return reindent`
-          [
-            ${items.join('\n')}
-          ]
-        `;
-      }
-
-      const entries: string[] = [];
-      for (const [key, val] of Object.entries(value)) {
-        if (key.startsWith('$') && key !== '$type') continue;
-        entries.push(`${key}: ${format(val)}`);
-      }
-      seen.delete(value);
-      return reindent`
-        {
-          ${entries.join('\n')}
-        }
-      `;
+    if (Array.isArray(value)) {
+      return value.map(transform);
     }
 
-    return String(value);
+    const result: Record<string, unknown> = {};
+    for (const [key, val] of Object.entries(value)) {
+      if (key.startsWith('$') && key !== '$type') continue;
+      result[key] = transform(val);
+    }
+    return result;
   }
 
-  return format(obj);
+  return transform(obj);
 }
 
 /** Unindent the given template to root level, and reindent the interpolations to their respective
