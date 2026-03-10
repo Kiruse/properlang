@@ -1,12 +1,12 @@
 // Monarch syntax highlighting for the properlang language.
 export default {
     keywords: [
-        '!in','!instanceof','!is','and','as','const','else','false','fn','for','from','if','import','in','instanceof','is','isnt','let','n','number','or','return','this','true','types','unless','while','xor'
+        '!in','!instanceof','!is','and','as','const','else','false','fn','for','from','if','import','in','instanceof','is','isnt','let','n','new','number','or','return','this','true','types','unless','while','xor'
     ],
     operators: [
-        '!','!=','%','&&','*','**','+','++',',','-','--','.','..','...','/',':',';','<','<=','=','==','>','>=','?','||'
+        '!','!=','%','%=','&&','*','**','*=','+','++','+=',',','-','--','-=','.','..','...','/','/=',':',';','<','<=','=','==','=>','>','>=','?','?=','||'
     ],
-    symbols: /!|!=|%|&&|\(|\)|\*|\*\*|\+|\+\+|,|-|--|\.|\.\.|\.\.\.|\/|:|;|<|<=|=|==|>|>=|\?|\[|\]|\{|\|\||\}/,
+    symbols: /!|!=|%|%=|&&|\(|\)|\*|\*\*|\*=|\+|\+\+|\+=|,|-|--|-=|\.|\.\.|\.\.\.|\/|\/=|:|;|<|<=|=|==|=>|>|>=|\?|\?=|\[|\]|\{|\|\||\}/,
 
     tokenizer: {
         initial: [
@@ -22,7 +22,6 @@ export default {
             { regex: /\}(?:[^$\\]|\\.|\$(?!\{))*`/, action: {"token":"TPL_END"} },
             { regex: /\}(?:[^$\\]|\\.|\$(?!\{))*\$\{/, action: {"token":"TPL_BTWN"} },
             { regex: /\/\*\*(?:[\s\S])*\*\//, action: {"token":"DOC_COMMENT"} },
-            { regex: /<=|<|>=|>|==|!=/, action: {"token":"RELATION_OP"} },
             { include: '@whitespace' },
             { regex: /@symbols/, action: { cases: { '@operators': {"token":"operator"}, '@default': {"token":""} }} },
         ],

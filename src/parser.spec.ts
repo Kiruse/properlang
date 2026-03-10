@@ -71,7 +71,7 @@ describe('ProperLang Parser', () => {
         expect(typeof templateLit.vals[0]).toBe('string');
         expect(typeof templateLit.vals[1]).toBe('object');
         expect(typeof templateLit.vals[2]).toBe('string');
-        expect(templateLit.vals[1].$type).toBe('PrimaryExpr');
+        expect(templateLit.vals[1].$type).toBe('AccessorExpr');
       });
     });
 

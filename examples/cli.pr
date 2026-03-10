@@ -1,11 +1,18 @@
-import { program } from 'commander';
+import { Command } from 'commander';
+import * as fs from 'fs/promises';
+
+const program = new Command();
 
 program
-  .options('-s, --silent')
-  .parse();
-
-const { silent } = program.opts();
-
-unless silent:
-  console.log('Hello, world!');
-console.log('oki');
+  .command('bump')
+  .option('-s, --silent')
+  .option('--amount <value>', 'Amount to bump by', 1)
+  .action((options) => {
+    const { amount, silent } = options;
+    let doc = JSON.parse(fs.readFile('data/counter.json').await);
+    doc.value += amount;
+    fs.writeFile('data/counter.json').await;
+    unless silent:
+      console.log(`Bumped by ${amount} to ${doc.value}`);
+  });
+program.parse();

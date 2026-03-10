@@ -1,6 +1,16 @@
 let counter = Math.random();
 
 for let i in 0..parseInt(process!.argv[0]):
-  counter++;
+  if i % 3 is 1:
+    counter++;
 
 console.log(`Counter: ${counter}`);
+
+fn doSomething(value: number < 5) {
+  value *= 2;
+  value++;
+  if value == 42:
+    console.log('Answer of life, the universe & everything');
+  else:
+    console.log('Just a number');
+}

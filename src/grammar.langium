@@ -17,7 +17,6 @@ hidden terminal WS: /\s+/;
 terminal DOC_COMMENT: '/**' .* '*/';
 hidden terminal LINE_COMMENT: '//' .*;
 hidden terminal BLOCK_COMMENT: '/*' .* '*/';
-terminal RELATION_OP: '<=' | '<' | '>=' | '>' | '==' | '!=';
 
 entry Program: stmts+=TopLevelStmt*;
 
@@ -27,31 +26,36 @@ TopLevelStmt:
 
 Stmt:
     FnDecl
-  | VarDecl ';'
+  | VarDecl
   | IfExpr
-  | Expr ';'
   | ForStmt
   | WhileStmt
-  | Literal ';'
   | ReturnStmt
+  | Block
+  | Expr ';'
+  | Literal ';'
   ;
 
 ImportDecl:
-    'import' kwTypes='types' 'from' path=StringLit ';' // for type compatibility imports
-  | 'import' '*' 'as' name=ID 'from' path=StringLit ';'
+    {infer ImportTypesDecl} 'import' 'types' 'from' path=StringLit ';' // for type compatibility imports
+  | {infer ImportAllDecl}   'import' '*' 'as' name=ID 'from' path=StringLit ';'
   | 'import' name=ID ',' '{' names+=ID* '}' 'from' path=StringLit ';'
   | 'import' name=ID 'from' path=StringLit ';'
   | 'import' '{' names+=ID* '}' 'from' path=StringLit ';'
   | 'import' 'from' path=StringLit ';'
   ;
-ReturnStmt: 'return' value=Expr?;
 
-IfExpr: kw=('if' | 'unless') condition=Expr ':'? consequent=Stmt ('else' ':'? alternate=Stmt)?;
+Block: '{' stmts+=Stmt* '}';
+ExprStmt: Expr ';';
+ReturnStmt: 'return' value=Expr? ';';
+
+IfExpr: ('if' | {infer UnlessExpr} 'unless') condition=Expr ':'? consequent=Stmt ('else' ':'? alternate=Stmt)?;
 
 ForStmt: 'for' 'let' iterator=ID 'in' collection=Expr ':'? consequent=Stmt;
 WhileStmt: 'while' condition=Expr ':'? consequent=Stmt;
 
-Expr: BinaryExpr | PrimaryExpr;
+Expr: AssignExpr | BinaryExpr | PrimaryExpr;
+AssignExpr: left=Accessor op=('=' | '+=' | '-=' | '*=' | '/=' | '%=' | '?=') right=Expr;
 infix BinaryExpr on PrimaryExpr:
     right assoc '**'
   > '*' | '/' | '%'
@@ -63,27 +67,32 @@ infix BinaryExpr on PrimaryExpr:
 PrefixExpr: op=('+'|'-') operand=Expr | op=('++'|'--') operand=Accessor;
 PostfixExpr: operand=Accessor op=('++'|'--');
 PrimaryExpr:
-    '(' expr=Expr ')'
-  | value=Literal
-  | expr=PrefixExpr
-  | expr=PostfixExpr
-  | expr=Accessor
+    FnDecl
+  | {infer ArrowExpr} '(' (params+=Param (',' params+=Param)*)? ')' '=>' body=(Expr | Block)
+    // JS "tuples", i.e. execute all exprs and return the last one
+  | {infer TupleExpr} '(' exprs+=Expr (',' exprs+=Expr)* ')'
+  | {infer NewExpr} 'new' Accessor
+  | IfExpr
+  | Literal
+  | PrefixExpr
+  | PostfixExpr
+  | Accessor
   ;
 
-FnDecl: doc=DOC_COMMENT? 'fn' name=ID '(' params+=Param* ')';
-Param: name=ID ':' constraint=Constraint;
+FnDecl: doc=DOC_COMMENT? 'fn' name=ID '(' params+=Param* ')' ':'? body=(ExprStmt | Block);
+Param: name=ID (':' constraint=Constraint)?;
 
 VarDecl:
-    kw='let' name=ID ':' constraint=Constraint
-  | kw=('let' | 'const') name=ID '=' value=Expr
-  | kw=('let' | 'const') '{' destruct+=DestructureDecl* '}' '=' value=Expr;
+    kw='let' name=ID ':' constraint=Constraint ';'
+  | kw=('let' | 'const') name=ID '=' value=Expr ';'
+  | kw=('let' | 'const') '{' (destruct+=DestructureDecl (',' destruct+=DestructureDecl)*)? '}' '=' value=Expr ';';
 DestructureDecl: name=ID (':' rename=ID)?;
 
 Accessor: id=(ID | 'this') members+=MemberAccessor*;
 MemberAccessor:
     {infer MemberPropAccessor}  nullish=('?' | '!')? '.' prop=ID
-  | {infer MemberIndexAccessor} '[' index=Expr ']'
-  | {infer MemberCallAccessor}  '(' args+=Expr* ')';
+  | {infer MemberIndexAccessor} nullish=('?' | '!')? '[' index=Expr ']'
+  | {infer MemberCallAccessor}  nullish=('?' | '!')? '(' (args+=Expr (',' args+=Expr)*)? ')';
 
 Literal: RangeLit | BigintLit | NumberLit | BoolLit | TemplateLit | StringLit;
 RangeLit: min=RangeBound op=('..' | '...') max=RangeBound;
@@ -100,6 +109,7 @@ TemplateLit:
 
 Constraint: NumberConstraint;
 NumberConstraint:
-    'number' op=RELATION_OP ref=NUMBER
+    'number' op=('<' | '<=' | '>' | '>=' | '!=') ref=NUMBER
   | min=NUMBER op=('<' | '<=') 'number' ('<' | '<=') max=NUMBER
-  | max=NUMBER op=('>' | '>=') 'number' ('>' | '>=') min=NUMBER;
+  | max=NUMBER op=('>' | '>=') 'number' ('>' | '>=') min=NUMBER
+  | 'number';

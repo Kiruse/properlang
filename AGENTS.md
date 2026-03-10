@@ -1,5 +1,7 @@
 # ProperLang - Agent Guidelines
 
+**IMPORTANT:** Assert that your changes function properly by running `bun parse:examples`. If the examples do not parse successfully, you may run `bun parse:example <name>` to parse a specific example and get its detailed errors.
+
 ## Build Commands
 
 ### Core Commands
@@ -15,6 +17,13 @@
 ### Development
 - `bun --hot ./src/index.ts` - Run with hot reload (HMR)
 - Generated files are in `src/generated/language-server/` - DO NOT EDIT MANUALLY
+
+### Scripts
+Utility scripts in `scripts/` directory:
+- `bun run scripts/parse-example.ts <name>` - Parse named example & print result
+- `bun run scripts/parse-examples.ts` - Parse all `.pr` files in `examples/`, output logs to `tmp/`
+- `bun run scripts/list-examples.ts` - Print contents of all example files
+- `bun run scripts/watch-grammar.ts` - Watch grammar file, regenerate parser and reparse examples on change
 
 ## Code Style Guidelines
 
@@ -75,13 +84,25 @@ import { ProperLangAstReflection } from './ast.js';
 src/
   index.ts              # Main entry point
   grammar.langium       # Grammar definition (EDIT THIS)
-  parser.ts             # Factory for creating configured LangiumParser instances
+  parser.ts             # Parser factory
   parser.spec.ts        # Parser unit tests (template literals, interpolation, mode switching)
+  validation.ts         # AST validation (validate, ValidationError, parameter constraints)
   generated/            # Auto-generated (DO NOT EDIT)
     language-server/
       ast.ts           # AST node definitions
       grammar.ts       # Generated parser
       module.ts        # Langium module
+scripts/
+  parse-example.ts      # Parse example & print result
+  parse-examples.ts     # Parse all examples, write logs to tmp/
+  list-examples.ts      # Print all example file contents
+  watch-grammar.ts      # Watch grammar, regenerate and reparse on change
+examples/
+  counter.pr            # Counter example (variables, loops, templates)
+  cli.pr                # CLI example (imports, method chains)
+docs/
+  GRAMMAR.md            # Language syntax reference
+  API.md                # Parser and validation API documentation
 syntaxes/
   properlang.tmLanguage.json  # TextMate grammar (generated)
   properlang.monarch.ts       # Monarch tokenizer (generated)

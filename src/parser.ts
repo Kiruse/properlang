@@ -1,10 +1,11 @@
-import type { TokenType, CustomPatternMatcherFunc, IMultiModeLexerDefinition, IToken } from 'chevrotain';
+import type { TokenType, IMultiModeLexerDefinition, IToken } from 'chevrotain';
 import { Lexer } from 'chevrotain';
 import { ProperLangLanguageMetaData } from './generated/language-server/module.js';
 import { ProperLangGrammar } from './generated/language-server/grammar.js';
 import { ProperLangAstReflection } from './generated/language-server/ast.js';
-import { createParser, DefaultLexer, DefaultLexerErrorMessageProvider, LangiumParserErrorMessageProvider, LangiumParser, DefaultLangiumProfiler, DefaultTokenBuilder } from 'langium';
+import { createParser, DefaultLexerErrorMessageProvider, LangiumParserErrorMessageProvider, LangiumParser, DefaultLangiumProfiler, DefaultTokenBuilder } from 'langium';
 import type { LexerResult } from 'langium';
+import { validate } from './validation.js';
 
 const INTERPOLATION_MODE = 'interpolation';
 
@@ -101,7 +102,7 @@ class MultiModeLexer {
   }
 }
 
-export function createProperLangParser(): LangiumParser {
+export function createProperLangParser() {
   const grammar = ProperLangGrammar();
   const lexerErrorMessageProvider = new DefaultLexerErrorMessageProvider();
   const parserErrorMessageProvider = new LangiumParserErrorMessageProvider();
@@ -157,5 +158,15 @@ export function createProperLangParser(): LangiumParser {
   createParser(grammar, parser, tokenDict);
   parser.finalize();
 
-  return parser;
+  return {
+    ...parser,
+    parse: (text: string) => {
+      const result = parser.parse(text);
+      const validationErrors = validate(result.value);
+      return {
+        ...result,
+        validationErrors
+      };
+    },
+  }
 }

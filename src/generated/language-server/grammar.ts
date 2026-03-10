@@ -346,90 +346,6 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
       "fragment": false
     },
     {
-      "$type": "TerminalRule",
-      "name": "RELATION_OP",
-      "definition": {
-        "$type": "TerminalAlternatives",
-        "elements": [
-          {
-            "$type": "TerminalAlternatives",
-            "elements": [
-              {
-                "$type": "TerminalAlternatives",
-                "elements": [
-                  {
-                    "$type": "TerminalAlternatives",
-                    "elements": [
-                      {
-                        "$type": "TerminalAlternatives",
-                        "elements": [
-                          {
-                            "$type": "CharacterRange",
-                            "left": {
-                              "$type": "Keyword",
-                              "value": "<="
-                            },
-                            "parenthesized": false
-                          },
-                          {
-                            "$type": "CharacterRange",
-                            "left": {
-                              "$type": "Keyword",
-                              "value": "<"
-                            },
-                            "parenthesized": false
-                          }
-                        ],
-                        "parenthesized": false
-                      },
-                      {
-                        "$type": "CharacterRange",
-                        "left": {
-                          "$type": "Keyword",
-                          "value": ">="
-                        },
-                        "parenthesized": false
-                      }
-                    ],
-                    "parenthesized": false
-                  },
-                  {
-                    "$type": "CharacterRange",
-                    "left": {
-                      "$type": "Keyword",
-                      "value": ">"
-                    },
-                    "parenthesized": false
-                  }
-                ],
-                "parenthesized": false
-              },
-              {
-                "$type": "CharacterRange",
-                "left": {
-                  "$type": "Keyword",
-                  "value": "=="
-                },
-                "parenthesized": false
-              }
-            ],
-            "parenthesized": false
-          },
-          {
-            "$type": "CharacterRange",
-            "left": {
-              "$type": "Keyword",
-              "value": "!="
-            },
-            "parenthesized": false
-          }
-        ],
-        "parenthesized": false
-      },
-      "fragment": false,
-      "hidden": false
-    },
-    {
       "$type": "ParserRule",
       "entry": true,
       "name": "Program",
@@ -440,7 +356,7 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
         "terminal": {
           "$type": "RuleCall",
           "rule": {
-            "$ref": "#/rules@17"
+            "$ref": "#/rules@16"
           },
           "arguments": []
         },
@@ -458,14 +374,14 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@18"
+              "$ref": "#/rules@17"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@19"
+              "$ref": "#/rules@18"
             },
             "arguments": []
           }
@@ -484,48 +400,16 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@29"
+              "$ref": "#/rules@31"
             },
             "arguments": []
-          },
-          {
-            "$type": "Group",
-            "elements": [
-              {
-                "$type": "RuleCall",
-                "rule": {
-                  "$ref": "#/rules@31"
-                },
-                "arguments": []
-              },
-              {
-                "$type": "Keyword",
-                "value": ";"
-              }
-            ]
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@21"
+              "$ref": "#/rules@33"
             },
             "arguments": []
-          },
-          {
-            "$type": "Group",
-            "elements": [
-              {
-                "$type": "RuleCall",
-                "rule": {
-                  "$ref": "#/rules@24"
-                },
-                "arguments": []
-              },
-              {
-                "$type": "Keyword",
-                "value": ";"
-              }
-            ]
           },
           {
             "$type": "RuleCall",
@@ -542,12 +426,33 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
             "arguments": []
           },
           {
+            "$type": "RuleCall",
+            "rule": {
+              "$ref": "#/rules@24"
+            },
+            "arguments": []
+          },
+          {
+            "$type": "RuleCall",
+            "rule": {
+              "$ref": "#/rules@21"
+            },
+            "arguments": []
+          },
+          {
+            "$type": "RuleCall",
+            "rule": {
+              "$ref": "#/rules@19"
+            },
+            "arguments": []
+          },
+          {
             "$type": "Group",
             "elements": [
               {
                 "$type": "RuleCall",
                 "rule": {
-                  "$ref": "#/rules@35"
+                  "$ref": "#/rules@25"
                 },
                 "arguments": []
               },
@@ -558,11 +463,20 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
             ]
           },
           {
-            "$type": "RuleCall",
-            "rule": {
-              "$ref": "#/rules@20"
-            },
-            "arguments": []
+            "$type": "Group",
+            "elements": [
+              {
+                "$type": "RuleCall",
+                "rule": {
+                  "$ref": "#/rules@37"
+                },
+                "arguments": []
+              },
+              {
+                "$type": "Keyword",
+                "value": ";"
+              }
+            ]
           }
         ]
       },
@@ -580,17 +494,19 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
             "$type": "Group",
             "elements": [
               {
+                "$type": "Action",
+                "inferredType": {
+                  "$type": "InferredType",
+                  "name": "ImportTypesDecl"
+                }
+              },
+              {
                 "$type": "Keyword",
                 "value": "import"
               },
               {
-                "$type": "Assignment",
-                "feature": "kwTypes",
-                "operator": "=",
-                "terminal": {
-                  "$type": "Keyword",
-                  "value": "types"
-                }
+                "$type": "Keyword",
+                "value": "types"
               },
               {
                 "$type": "Keyword",
@@ -603,7 +519,7 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@41"
+                    "$ref": "#/rules@43"
                   },
                   "arguments": []
                 }
@@ -617,6 +533,13 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
           {
             "$type": "Group",
             "elements": [
+              {
+                "$type": "Action",
+                "inferredType": {
+                  "$type": "InferredType",
+                  "name": "ImportAllDecl"
+                }
+              },
               {
                 "$type": "Keyword",
                 "value": "import"
@@ -652,7 +575,7 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@41"
+                    "$ref": "#/rules@43"
                   },
                   "arguments": []
                 }
@@ -718,7 +641,7 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@41"
+                    "$ref": "#/rules@43"
                   },
                   "arguments": []
                 }
@@ -759,7 +682,7 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@41"
+                    "$ref": "#/rules@43"
                   },
                   "arguments": []
                 }
@@ -809,7 +732,7 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@41"
+                    "$ref": "#/rules@43"
                   },
                   "arguments": []
                 }
@@ -838,7 +761,7 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@41"
+                    "$ref": "#/rules@43"
                   },
                   "arguments": []
                 }
@@ -848,6 +771,62 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
                 "value": ";"
               }
             ]
+          }
+        ]
+      },
+      "entry": false,
+      "fragment": false,
+      "parameters": []
+    },
+    {
+      "$type": "ParserRule",
+      "name": "Block",
+      "definition": {
+        "$type": "Group",
+        "elements": [
+          {
+            "$type": "Keyword",
+            "value": "{"
+          },
+          {
+            "$type": "Assignment",
+            "feature": "stmts",
+            "operator": "+=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@17"
+              },
+              "arguments": []
+            },
+            "cardinality": "*"
+          },
+          {
+            "$type": "Keyword",
+            "value": "}"
+          }
+        ]
+      },
+      "entry": false,
+      "fragment": false,
+      "parameters": []
+    },
+    {
+      "$type": "ParserRule",
+      "name": "ExprStmt",
+      "definition": {
+        "$type": "Group",
+        "elements": [
+          {
+            "$type": "RuleCall",
+            "rule": {
+              "$ref": "#/rules@25"
+            },
+            "arguments": []
+          },
+          {
+            "$type": "Keyword",
+            "value": ";"
           }
         ]
       },
@@ -872,11 +851,15 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@24"
+                "$ref": "#/rules@25"
               },
               "arguments": []
             },
             "cardinality": "?"
+          },
+          {
+            "$type": "Keyword",
+            "value": ";"
           }
         ]
       },
@@ -891,22 +874,29 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
         "$type": "Group",
         "elements": [
           {
-            "$type": "Assignment",
-            "feature": "kw",
-            "operator": "=",
-            "terminal": {
-              "$type": "Alternatives",
-              "elements": [
-                {
-                  "$type": "Keyword",
-                  "value": "if"
-                },
-                {
-                  "$type": "Keyword",
-                  "value": "unless"
-                }
-              ]
-            }
+            "$type": "Alternatives",
+            "elements": [
+              {
+                "$type": "Keyword",
+                "value": "if"
+              },
+              {
+                "$type": "Group",
+                "elements": [
+                  {
+                    "$type": "Action",
+                    "inferredType": {
+                      "$type": "InferredType",
+                      "name": "UnlessExpr"
+                    }
+                  },
+                  {
+                    "$type": "Keyword",
+                    "value": "unless"
+                  }
+                ]
+              }
+            ]
           },
           {
             "$type": "Assignment",
@@ -915,7 +905,7 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@24"
+                "$ref": "#/rules@25"
               },
               "arguments": []
             }
@@ -932,7 +922,7 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@18"
+                "$ref": "#/rules@17"
               },
               "arguments": []
             }
@@ -956,7 +946,7 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@18"
+                    "$ref": "#/rules@17"
                   },
                   "arguments": []
                 }
@@ -1007,7 +997,7 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@24"
+                "$ref": "#/rules@25"
               },
               "arguments": []
             }
@@ -1024,7 +1014,7 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@18"
+                "$ref": "#/rules@17"
               },
               "arguments": []
             }
@@ -1052,7 +1042,7 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@24"
+                "$ref": "#/rules@25"
               },
               "arguments": []
             }
@@ -1069,7 +1059,7 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@18"
+                "$ref": "#/rules@17"
               },
               "arguments": []
             }
@@ -1089,16 +1079,97 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@25"
+              "$ref": "#/rules@26"
             },
             "arguments": []
           },
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@28"
+              "$ref": "#/rules@27"
             },
             "arguments": []
+          },
+          {
+            "$type": "RuleCall",
+            "rule": {
+              "$ref": "#/rules@30"
+            },
+            "arguments": []
+          }
+        ]
+      },
+      "entry": false,
+      "fragment": false,
+      "parameters": []
+    },
+    {
+      "$type": "ParserRule",
+      "name": "AssignExpr",
+      "definition": {
+        "$type": "Group",
+        "elements": [
+          {
+            "$type": "Assignment",
+            "feature": "left",
+            "operator": "=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@35"
+              },
+              "arguments": []
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "op",
+            "operator": "=",
+            "terminal": {
+              "$type": "Alternatives",
+              "elements": [
+                {
+                  "$type": "Keyword",
+                  "value": "="
+                },
+                {
+                  "$type": "Keyword",
+                  "value": "+="
+                },
+                {
+                  "$type": "Keyword",
+                  "value": "-="
+                },
+                {
+                  "$type": "Keyword",
+                  "value": "*="
+                },
+                {
+                  "$type": "Keyword",
+                  "value": "/="
+                },
+                {
+                  "$type": "Keyword",
+                  "value": "%="
+                },
+                {
+                  "$type": "Keyword",
+                  "value": "?="
+                }
+              ]
+            }
+          },
+          {
+            "$type": "Assignment",
+            "feature": "right",
+            "operator": "=",
+            "terminal": {
+              "$type": "RuleCall",
+              "rule": {
+                "$ref": "#/rules@25"
+              },
+              "arguments": []
+            }
           }
         ]
       },
@@ -1112,7 +1183,7 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
       "call": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@28"
+          "$ref": "#/rules@30"
         },
         "arguments": []
       },
@@ -1285,7 +1356,7 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@24"
+                    "$ref": "#/rules@25"
                   },
                   "arguments": []
                 }
@@ -1320,7 +1391,7 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@33"
+                    "$ref": "#/rules@35"
                   },
                   "arguments": []
                 }
@@ -1346,7 +1417,7 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@33"
+                "$ref": "#/rules@35"
               },
               "arguments": []
             }
@@ -1382,23 +1453,147 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
         "$type": "Alternatives",
         "elements": [
           {
+            "$type": "RuleCall",
+            "rule": {
+              "$ref": "#/rules@31"
+            },
+            "arguments": []
+          },
+          {
             "$type": "Group",
             "elements": [
+              {
+                "$type": "Action",
+                "inferredType": {
+                  "$type": "InferredType",
+                  "name": "ArrowExpr"
+                }
+              },
+              {
+                "$type": "Keyword",
+                "value": "("
+              },
+              {
+                "$type": "Group",
+                "elements": [
+                  {
+                    "$type": "Assignment",
+                    "feature": "params",
+                    "operator": "+=",
+                    "terminal": {
+                      "$type": "RuleCall",
+                      "rule": {
+                        "$ref": "#/rules@32"
+                      },
+                      "arguments": []
+                    }
+                  },
+                  {
+                    "$type": "Group",
+                    "elements": [
+                      {
+                        "$type": "Keyword",
+                        "value": ","
+                      },
+                      {
+                        "$type": "Assignment",
+                        "feature": "params",
+                        "operator": "+=",
+                        "terminal": {
+                          "$type": "RuleCall",
+                          "rule": {
+                            "$ref": "#/rules@32"
+                          },
+                          "arguments": []
+                        }
+                      }
+                    ],
+                    "cardinality": "*"
+                  }
+                ],
+                "cardinality": "?"
+              },
+              {
+                "$type": "Keyword",
+                "value": ")"
+              },
+              {
+                "$type": "Keyword",
+                "value": "=>"
+              },
+              {
+                "$type": "Assignment",
+                "feature": "body",
+                "operator": "=",
+                "terminal": {
+                  "$type": "Alternatives",
+                  "elements": [
+                    {
+                      "$type": "RuleCall",
+                      "rule": {
+                        "$ref": "#/rules@25"
+                      },
+                      "arguments": []
+                    },
+                    {
+                      "$type": "RuleCall",
+                      "rule": {
+                        "$ref": "#/rules@19"
+                      },
+                      "arguments": []
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "$type": "Group",
+            "elements": [
+              {
+                "$type": "Action",
+                "inferredType": {
+                  "$type": "InferredType",
+                  "name": "TupleExpr"
+                }
+              },
               {
                 "$type": "Keyword",
                 "value": "("
               },
               {
                 "$type": "Assignment",
-                "feature": "expr",
-                "operator": "=",
+                "feature": "exprs",
+                "operator": "+=",
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@24"
+                    "$ref": "#/rules@25"
                   },
                   "arguments": []
                 }
+              },
+              {
+                "$type": "Group",
+                "elements": [
+                  {
+                    "$type": "Keyword",
+                    "value": ","
+                  },
+                  {
+                    "$type": "Assignment",
+                    "feature": "exprs",
+                    "operator": "+=",
+                    "terminal": {
+                      "$type": "RuleCall",
+                      "rule": {
+                        "$ref": "#/rules@25"
+                      },
+                      "arguments": []
+                    }
+                  }
+                ],
+                "cardinality": "*"
               },
               {
                 "$type": "Keyword",
@@ -1407,52 +1602,62 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
             ]
           },
           {
-            "$type": "Assignment",
-            "feature": "value",
-            "operator": "=",
-            "terminal": {
-              "$type": "RuleCall",
-              "rule": {
-                "$ref": "#/rules@35"
+            "$type": "Group",
+            "elements": [
+              {
+                "$type": "Action",
+                "inferredType": {
+                  "$type": "InferredType",
+                  "name": "NewExpr"
+                }
               },
-              "arguments": []
-            }
+              {
+                "$type": "Keyword",
+                "value": "new"
+              },
+              {
+                "$type": "RuleCall",
+                "rule": {
+                  "$ref": "#/rules@35"
+                },
+                "arguments": []
+              }
+            ]
           },
           {
-            "$type": "Assignment",
-            "feature": "expr",
-            "operator": "=",
-            "terminal": {
-              "$type": "RuleCall",
-              "rule": {
-                "$ref": "#/rules@26"
-              },
-              "arguments": []
-            }
+            "$type": "RuleCall",
+            "rule": {
+              "$ref": "#/rules@22"
+            },
+            "arguments": []
           },
           {
-            "$type": "Assignment",
-            "feature": "expr",
-            "operator": "=",
-            "terminal": {
-              "$type": "RuleCall",
-              "rule": {
-                "$ref": "#/rules@27"
-              },
-              "arguments": []
-            }
+            "$type": "RuleCall",
+            "rule": {
+              "$ref": "#/rules@37"
+            },
+            "arguments": []
           },
           {
-            "$type": "Assignment",
-            "feature": "expr",
-            "operator": "=",
-            "terminal": {
-              "$type": "RuleCall",
-              "rule": {
-                "$ref": "#/rules@33"
-              },
-              "arguments": []
-            }
+            "$type": "RuleCall",
+            "rule": {
+              "$ref": "#/rules@28"
+            },
+            "arguments": []
+          },
+          {
+            "$type": "RuleCall",
+            "rule": {
+              "$ref": "#/rules@29"
+            },
+            "arguments": []
+          },
+          {
+            "$type": "RuleCall",
+            "rule": {
+              "$ref": "#/rules@35"
+            },
+            "arguments": []
           }
         ]
       },
@@ -1506,7 +1711,7 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@30"
+                "$ref": "#/rules@32"
               },
               "arguments": []
             },
@@ -1515,6 +1720,35 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
           {
             "$type": "Keyword",
             "value": ")"
+          },
+          {
+            "$type": "Keyword",
+            "value": ":",
+            "cardinality": "?"
+          },
+          {
+            "$type": "Assignment",
+            "feature": "body",
+            "operator": "=",
+            "terminal": {
+              "$type": "Alternatives",
+              "elements": [
+                {
+                  "$type": "RuleCall",
+                  "rule": {
+                    "$ref": "#/rules@20"
+                  },
+                  "arguments": []
+                },
+                {
+                  "$type": "RuleCall",
+                  "rule": {
+                    "$ref": "#/rules@19"
+                  },
+                  "arguments": []
+                }
+              ]
+            }
           }
         ]
       },
@@ -1541,20 +1775,26 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
             }
           },
           {
-            "$type": "Keyword",
-            "value": ":"
-          },
-          {
-            "$type": "Assignment",
-            "feature": "constraint",
-            "operator": "=",
-            "terminal": {
-              "$type": "RuleCall",
-              "rule": {
-                "$ref": "#/rules@43"
+            "$type": "Group",
+            "elements": [
+              {
+                "$type": "Keyword",
+                "value": ":"
               },
-              "arguments": []
-            }
+              {
+                "$type": "Assignment",
+                "feature": "constraint",
+                "operator": "=",
+                "terminal": {
+                  "$type": "RuleCall",
+                  "rule": {
+                    "$ref": "#/rules@45"
+                  },
+                  "arguments": []
+                }
+              }
+            ],
+            "cardinality": "?"
           }
         ]
       },
@@ -1603,10 +1843,14 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@43"
+                    "$ref": "#/rules@45"
                   },
                   "arguments": []
                 }
+              },
+              {
+                "$type": "Keyword",
+                "value": ";"
               }
             ]
           },
@@ -1654,10 +1898,14 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@24"
+                    "$ref": "#/rules@25"
                   },
                   "arguments": []
                 }
+              },
+              {
+                "$type": "Keyword",
+                "value": ";"
               }
             ]
           },
@@ -1687,17 +1935,44 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
                 "value": "{"
               },
               {
-                "$type": "Assignment",
-                "feature": "destruct",
-                "operator": "+=",
-                "terminal": {
-                  "$type": "RuleCall",
-                  "rule": {
-                    "$ref": "#/rules@32"
+                "$type": "Group",
+                "elements": [
+                  {
+                    "$type": "Assignment",
+                    "feature": "destruct",
+                    "operator": "+=",
+                    "terminal": {
+                      "$type": "RuleCall",
+                      "rule": {
+                        "$ref": "#/rules@34"
+                      },
+                      "arguments": []
+                    }
                   },
-                  "arguments": []
-                },
-                "cardinality": "*"
+                  {
+                    "$type": "Group",
+                    "elements": [
+                      {
+                        "$type": "Keyword",
+                        "value": ","
+                      },
+                      {
+                        "$type": "Assignment",
+                        "feature": "destruct",
+                        "operator": "+=",
+                        "terminal": {
+                          "$type": "RuleCall",
+                          "rule": {
+                            "$ref": "#/rules@34"
+                          },
+                          "arguments": []
+                        }
+                      }
+                    ],
+                    "cardinality": "*"
+                  }
+                ],
+                "cardinality": "?"
               },
               {
                 "$type": "Keyword",
@@ -1714,10 +1989,14 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@24"
+                    "$ref": "#/rules@25"
                   },
                   "arguments": []
                 }
+              },
+              {
+                "$type": "Keyword",
+                "value": ";"
               }
             ]
           }
@@ -1807,7 +2086,7 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@34"
+                "$ref": "#/rules@36"
               },
               "arguments": []
             },
@@ -1883,6 +2162,25 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
                 }
               },
               {
+                "$type": "Assignment",
+                "feature": "nullish",
+                "operator": "=",
+                "terminal": {
+                  "$type": "Alternatives",
+                  "elements": [
+                    {
+                      "$type": "Keyword",
+                      "value": "?"
+                    },
+                    {
+                      "$type": "Keyword",
+                      "value": "!"
+                    }
+                  ]
+                },
+                "cardinality": "?"
+              },
+              {
                 "$type": "Keyword",
                 "value": "["
               },
@@ -1893,7 +2191,7 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@24"
+                    "$ref": "#/rules@25"
                   },
                   "arguments": []
                 }
@@ -1915,21 +2213,67 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
                 }
               },
               {
+                "$type": "Assignment",
+                "feature": "nullish",
+                "operator": "=",
+                "terminal": {
+                  "$type": "Alternatives",
+                  "elements": [
+                    {
+                      "$type": "Keyword",
+                      "value": "?"
+                    },
+                    {
+                      "$type": "Keyword",
+                      "value": "!"
+                    }
+                  ]
+                },
+                "cardinality": "?"
+              },
+              {
                 "$type": "Keyword",
                 "value": "("
               },
               {
-                "$type": "Assignment",
-                "feature": "args",
-                "operator": "+=",
-                "terminal": {
-                  "$type": "RuleCall",
-                  "rule": {
-                    "$ref": "#/rules@24"
+                "$type": "Group",
+                "elements": [
+                  {
+                    "$type": "Assignment",
+                    "feature": "args",
+                    "operator": "+=",
+                    "terminal": {
+                      "$type": "RuleCall",
+                      "rule": {
+                        "$ref": "#/rules@25"
+                      },
+                      "arguments": []
+                    }
                   },
-                  "arguments": []
-                },
-                "cardinality": "*"
+                  {
+                    "$type": "Group",
+                    "elements": [
+                      {
+                        "$type": "Keyword",
+                        "value": ","
+                      },
+                      {
+                        "$type": "Assignment",
+                        "feature": "args",
+                        "operator": "+=",
+                        "terminal": {
+                          "$type": "RuleCall",
+                          "rule": {
+                            "$ref": "#/rules@25"
+                          },
+                          "arguments": []
+                        }
+                      }
+                    ],
+                    "cardinality": "*"
+                  }
+                ],
+                "cardinality": "?"
               },
               {
                 "$type": "Keyword",
@@ -1952,21 +2296,14 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@36"
-            },
-            "arguments": []
-          },
-          {
-            "$type": "RuleCall",
-            "rule": {
-              "$ref": "#/rules@39"
-            },
-            "arguments": []
-          },
-          {
-            "$type": "RuleCall",
-            "rule": {
               "$ref": "#/rules@38"
+            },
+            "arguments": []
+          },
+          {
+            "$type": "RuleCall",
+            "rule": {
+              "$ref": "#/rules@41"
             },
             "arguments": []
           },
@@ -1987,7 +2324,14 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
           {
             "$type": "RuleCall",
             "rule": {
-              "$ref": "#/rules@41"
+              "$ref": "#/rules@44"
+            },
+            "arguments": []
+          },
+          {
+            "$type": "RuleCall",
+            "rule": {
+              "$ref": "#/rules@43"
             },
             "arguments": []
           }
@@ -2010,7 +2354,7 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@37"
+                "$ref": "#/rules@39"
               },
               "arguments": []
             }
@@ -2040,7 +2384,7 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@37"
+                "$ref": "#/rules@39"
               },
               "arguments": []
             }
@@ -2076,7 +2420,7 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
             "terminal": {
               "$type": "RuleCall",
               "rule": {
-                "$ref": "#/rules@33"
+                "$ref": "#/rules@35"
               },
               "arguments": []
             }
@@ -2276,7 +2620,7 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
                 "terminal": {
                   "$type": "RuleCall",
                   "rule": {
-                    "$ref": "#/rules@24"
+                    "$ref": "#/rules@25"
                   },
                   "arguments": []
                 }
@@ -2303,7 +2647,7 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
                     "terminal": {
                       "$type": "RuleCall",
                       "rule": {
-                        "$ref": "#/rules@24"
+                        "$ref": "#/rules@25"
                       },
                       "arguments": []
                     }
@@ -2337,7 +2681,7 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
       "definition": {
         "$type": "RuleCall",
         "rule": {
-          "$ref": "#/rules@44"
+          "$ref": "#/rules@46"
         },
         "arguments": []
       },
@@ -2363,11 +2707,29 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
                 "feature": "op",
                 "operator": "=",
                 "terminal": {
-                  "$type": "RuleCall",
-                  "rule": {
-                    "$ref": "#/rules@15"
-                  },
-                  "arguments": []
+                  "$type": "Alternatives",
+                  "elements": [
+                    {
+                      "$type": "Keyword",
+                      "value": "<"
+                    },
+                    {
+                      "$type": "Keyword",
+                      "value": "<="
+                    },
+                    {
+                      "$type": "Keyword",
+                      "value": ">"
+                    },
+                    {
+                      "$type": "Keyword",
+                      "value": ">="
+                    },
+                    {
+                      "$type": "Keyword",
+                      "value": "!="
+                    }
+                  ]
                 }
               },
               {
@@ -2511,6 +2873,10 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
                 }
               }
             ]
+          },
+          {
+            "$type": "Keyword",
+            "value": "number"
           }
         ]
       },
