@@ -1,12 +1,12 @@
 // Monarch syntax highlighting for the properlang language.
 export default {
     keywords: [
-        '!in','!instanceof','!is','and','as','const','else','false','fn','for','from','if','import','in','instanceof','is','isnt','let','n','new','or','return','this','true','types','unless','while','xor'
+        '!in','!instanceof','!is','and','as','const','declare','else','false','fn','for','from','global','if','import','in','instanceof','is','isnt','let','n','new','or','return','this','true','type','types','unless','where','while','xor'
     ],
     operators: [
-        '!','!=','%','%=','&&','*','**','*=','+','++','+=',',','-','--','-=','.','..','...','/','/=',':',';','<','<=','=','==','=>','>','>=','?','?=','||'
+        '!','!=','%','%=','&&','*','**','*=','+','++','+=',',','-','--','-=','->','.','..','...','/','/=',':',';','<','<=','=','==','=>','>','>=','?','?=','||'
     ],
-    symbols: /!|!=|%|%=|&&|\(|\)|\*|\*\*|\*=|\+|\+\+|\+=|,|-|--|-=|\.|\.\.|\.\.\.|\/|\/=|:|;|<|<=|=|==|=>|>|>=|\?|\?=|\[|\]|\{|\|\||\}/,
+    symbols: /!|!=|%|%=|&&|\(|\)|\*|\*\*|\*=|\+|\+\+|\+=|,|-|--|-=|->|\.|\.\.|\.\.\.|\/|\/=|:|;|<|<=|=|==|=>|>|>=|\?|\?=|\[|\]|\{|\|\||\}/,
 
     tokenizer: {
         initial: [
@@ -21,16 +21,19 @@ export default {
             { regex: /`(?:[^$\\]|\\.|\$(?!\{))*\$\{/, action: {"token":"TPL_START"} },
             { regex: /\}(?:[^$\\]|\\.|\$(?!\{))*`/, action: {"token":"TPL_END"} },
             { regex: /\}(?:[^$\\]|\\.|\$(?!\{))*\$\{/, action: {"token":"TPL_BTWN"} },
-            { regex: /\/\*\*(?:[\s\S])*\*\//, action: {"token":"DOC_COMMENT"} },
+            { regex: /\/\/\/[^\n]*\n/, action: {"token":"DOC_COMMENT"} },
             { include: '@whitespace' },
             { regex: /@symbols/, action: { cases: { '@operators': {"token":"operator"}, '@default': {"token":""} }} },
         ],
         whitespace: [
             { regex: /\s+/, action: {"token":"white"} },
-            { regex: /\/\/(?:[\s\S])*/, action: {"token":"comment"} },
+            { regex: /\/\//, action: {"token":"comment","next":"@comment"} },
             { regex: /\/\*/, action: {"token":"comment","next":"@comment"} },
         ],
         comment: [
+            { regex: /[^//]+/, action: {"token":"comment"} },
+            { regex: /\n/, action: {"token":"comment","next":"@pop"} },
+            { regex: /[//]/, action: {"token":"comment"} },
             { regex: /[^/\*]+/, action: {"token":"comment"} },
             { regex: /\*\//, action: {"token":"comment","next":"@pop"} },
             { regex: /[/\*]/, action: {"token":"comment"} },

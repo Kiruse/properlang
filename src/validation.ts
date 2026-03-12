@@ -23,7 +23,7 @@ function checkParamConstraints(
 ): void {
   const isCallback = isCallbackArg(node);
 
-  for (const param of node.params) {
+  for (const param of node.args) {
     if (!param.constraint && !isCallback) {
       accept('error', `Parameter '${param.name}' must have a type constraint when not in callback context`, {
         node: param,

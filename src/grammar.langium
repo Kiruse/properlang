@@ -14,14 +14,16 @@ terminal TPL_END: '}' /(?:[^$\\]|\\.|\$(?!\{))*/ '`';
 terminal TPL_BTWN: '}' /(?:[^$\\]|\\.|\$(?!\{))*/ '${';
 
 hidden terminal WS: /\s+/;
-terminal DOC_COMMENT: '/**' .* '*/';
-hidden terminal LINE_COMMENT: '//' .*;
+terminal DOC_COMMENT: '///' /[^\n]*/ '\n';
+hidden terminal LINE_COMMENT: '//' /[^\n]*/ '\n';
 hidden terminal BLOCK_COMMENT: '/*' .* '*/';
 
 entry Program: stmts+=TopLevelStmt*;
 
 TopLevelStmt:
     Stmt
+  | DeclareDecl
+  | ConstraintDecl
   | ImportDecl;
 
 Stmt:
@@ -37,13 +39,23 @@ Stmt:
   ;
 
 ImportDecl:
-    {infer ImportTypesDecl} 'import' 'types' 'from' path=StringLit ';' // for type compatibility imports
+    // for type compatibility imports; these will be stripped out during codegen
+    {infer ImportTypesDecl} 'import' 'types' 'from' path=StringLit ';'
   | {infer ImportAllDecl}   'import' '*' 'as' name=ID 'from' path=StringLit ';'
   | 'import' name=ID ',' '{' names+=ID* '}' 'from' path=StringLit ';'
   | 'import' name=ID 'from' path=StringLit ';'
   | 'import' '{' names+=ID* '}' 'from' path=StringLit ';'
   | 'import' 'from' path=StringLit ';'
   ;
+
+DeclareDecl:
+    'declare' 'global' 'const' name=ID ':' constraint=Constraint ';'
+  | 'declare' 'global' 'fn' name=ID '(' args+=Arg* ')' '->' return=Constraint ';'
+  | 'declare' 'const' name=ID ':' constraint=Constraint 'in' path=StringLit ';'
+  | 'declare' 'fn' name=ID '(' args+=Arg* ')' '->' return=Constraint 'in' path=StringLit ';'
+  ;
+
+ConstraintDecl: 'type' name=ID '=' constraint=Constraint ';';
 
 Block: '{' stmts+=Stmt* '}';
 ExprStmt: Expr ';';
@@ -68,7 +80,7 @@ PrefixExpr: op=('+'|'-') operand=Expr | op=('++'|'--') operand=Accessor;
 PostfixExpr: operand=Accessor op=('++'|'--');
 PrimaryExpr:
     FnDecl
-  | {infer ArrowExpr} '(' (params+=Param (',' params+=Param)*)? ')' '=>' body=(Expr | Block)
+  | {infer ArrowExpr} '(' (args+=Arg (',' args+=Arg)* ','?)? ')' '=>' body=(Expr | Block)
     // JS "tuples", i.e. execute all exprs and return the last one
   | {infer TupleExpr} '(' exprs+=Expr (',' exprs+=Expr)* ')'
   | {infer NewExpr} 'new' Accessor
@@ -79,8 +91,8 @@ PrimaryExpr:
   | Accessor
   ;
 
-FnDecl: doc=DOC_COMMENT? 'fn' name=ID '(' params+=Param* ')' ':'? body=(ExprStmt | Block);
-Param:
+FnDecl: 'fn' name=ID? '(' (args+=Arg (',' args+=Arg)* ','?)? ')' ('->' return=Constraint)? ':'? body=(ExprStmt | Block);
+Arg:
     {infer DestructureParam} '{' (destruct+=DestructureDecl (',' destruct+=DestructureDecl)*)? '}'
   | {infer RestParam} '...' name=ID (':' constraint=Constraint)?
   | name=ID (':' constraint=Constraint)?;
@@ -111,9 +123,15 @@ TemplateLit:
     vals+=TPL_END;
 
 Constraint:
-    BinaryConstraint
-  | TypeName;
-TypeName: name=ID; // built-in types + user-defined aliases
+    {infer ObjectConstraint} '{' (props+=PropConstraint (',' props+=PropConstraint)*)? ','? '}'
+  | ArrowFnConstraint
+  | FnConstraint
+  | BinaryConstraint
+  | WhereConstraint;
+PropConstraint: name=ID ':' constraint=Constraint;
+ArrowFnConstraint: '(' args+=Arg* ')' '->' return=Constraint;
+FnConstraint: 'fn' '(' args+=Arg* ')' ('->' return=Constraint)?;
+WhereConstraint: primary=PrimaryConstraint ('where' '{' (where+=PropConstraint (',' where+=PropConstraint)*)? ','? '}')?;
 infix BinaryConstraint on PrimaryConstraint:
     '<=' | '<' | '>' | '>='
   > '!=';
@@ -121,3 +139,4 @@ PrimaryConstraint:
     {infer ArrayConstraint} TypeName '[' ']'
   | TypeName
   | Literal;
+TypeName: name=ID ('{' (params+=TypeName (',' params+=TypeName)* ','?)? '}')?;

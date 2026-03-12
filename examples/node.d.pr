@@ -1,0 +1,8 @@
+declare global const process: Process;
+
+type Process = {
+  env: Record{string, string},
+  argv: string[] where {
+    length: number > 2,
+  },
+};

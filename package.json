@@ -3,7 +3,7 @@
   "module": "src/index.ts",
   "scripts": {
     "langium:generate": "langium generate",
-    "langium:watch": "bun run --watch ./scripts/watch-grammar.ts",
+    "dev": "bun run --watch ./scripts/watch-grammar.ts",
     "parse:example": "bun run ./scripts/parse-example.ts",
     "parse:examples": "bun run ./scripts/parse-examples.ts"
   },

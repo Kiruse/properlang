@@ -10,21 +10,26 @@
     },
     {
       "name": "keyword.control.properlang",
-      "match": "(?i)\\b(and|as|const|else|false|fn|for|from|if|import|in|instanceof|is|isnt|let|n|new|or|return|this|true|types|unless|while|xor)\\b|\\B(!in|!instanceof|!is)\\b"
+      "match": "(?i)\\b(and|as|const|declare|else|false|fn|for|from|global|if|import|in|instanceof|is|isnt|let|n|new|or|return|this|true|type|types|unless|where|while|xor)\\b|\\B(!in|!instanceof|!is)\\b"
     }
   ],
   "repository": {
     "comments": {
       "patterns": [
         {
+          "name": "comment.block.properlang",
           "begin": "//",
           "beginCaptures": {
-            "1": {
-              "name": "punctuation.whitespace.comment.leading.properlang"
+            "0": {
+              "name": "punctuation.definition.comment.properlang"
             }
           },
-          "end": "(?=$)",
-          "name": "comment.line.properlang"
+          "end": "\n",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.comment.properlang"
+            }
+          }
         },
         {
           "name": "comment.block.properlang",

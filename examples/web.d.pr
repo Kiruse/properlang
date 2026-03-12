@@ -1,0 +1,12 @@
+// Official type bridge for standard browser APIs.
+declare global const window: Window;
+
+type Window = {
+  alert: fn(msg: string),
+  // is equivalent to
+  alert: fn(msg: string) -> void,
+  confirm: (msg: string) -> boolean,
+  crypto: SubtleCrypto,
+};
+
+type SubtleCrypto = unknown;
