@@ -14,7 +14,7 @@ terminal TPL_END: '}' /(?:[^$\\]|\\.|\$(?!\{))*/ '`';
 terminal TPL_BTWN: '}' /(?:[^$\\]|\\.|\$(?!\{))*/ '${';
 
 hidden terminal WS: /\s+/;
-terminal DOC_COMMENT: '///' /[^\n]*/ '\n';
+terminal DOC_COMMENT: ('///' | '//!') /[^\n]*/ '\n';
 hidden terminal LINE_COMMENT: '//' /[^\n]*/ '\n';
 hidden terminal BLOCK_COMMENT: '/*' .* '*/';
 
@@ -53,9 +53,16 @@ DeclareDecl:
   | 'declare' 'global' 'fn' name=ID '(' args+=Arg* ')' '->' return=Constraint ';'
   | 'declare' 'const' name=ID ':' constraint=Constraint 'in' path=StringLit ';'
   | 'declare' 'fn' name=ID '(' args+=Arg* ')' '->' return=Constraint 'in' path=StringLit ';'
+  | 'declare' 'global' 'type' name=ID
+    ({infer DeclareClosedTypeDecl} '=' | {infer DeclareOpenTypeDecl} '<' | {infer DeclareTypeExtDecl} '|=')
+    constraint=Constraint ';'
+  | 'declare' 'type' name=ID '|=' constraint=Constraint 'in' path=StringLit ';'
   ;
 
-ConstraintDecl: 'type' name=ID '=' constraint=Constraint ';';
+ConstraintDecl:
+    'type' name=ID
+    ({infer ClosedTypeDecl} '=' | {infer OpenTypeDecl} '<')
+    constraint=Constraint ';';
 
 Block: '{' stmts+=Stmt* '}';
 ExprStmt: Expr ';';
@@ -143,4 +150,4 @@ PrimaryConstraint:
     {infer ArrayConstraint} TypeName '[' ']'
   | TypeName
   | Literal;
-TypeName: name=ID ('{' (params+=TypeName (',' params+=TypeName)* ','?)? '}')?;
+TypeName: name=ID ('{' (params+=TypeName (',' params+=TypeName)* ','?)? '}')? nullable='?'?;

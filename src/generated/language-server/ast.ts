@@ -95,6 +95,7 @@ export type ProperLangKeywordNames =
     | "while"
     | "xor"
     | "{"
+    | "|="
     | "||"
     | "}";
 
@@ -161,7 +162,7 @@ export function isArrowExpr(item: unknown): item is ArrowExpr {
 }
 
 export interface ArrowFnConstraint extends langium.AstNode {
-    readonly $container: Arg | ArrowFnConstraint | ConstraintDecl | DeclareDecl | DestructureDecl | FnConstraint | FnDecl | PropConstraint | RestParam | VarDecl;
+    readonly $container: Arg | ArrowFnConstraint | ClosedTypeDecl | DeclareClosedTypeDecl | DeclareDecl | DeclareOpenTypeDecl | DeclareTypeExtDecl | DestructureDecl | FnConstraint | FnDecl | OpenTypeDecl | PropConstraint | RestParam | VarDecl;
     readonly $type: 'ArrowFnConstraint';
     args: Array<Arg>;
     return: Constraint;
@@ -193,7 +194,7 @@ export function isBigintLit(item: unknown): item is BigintLit {
 }
 
 export interface BinaryConstraint extends langium.AstNode {
-    readonly $container: Arg | ArrowFnConstraint | ConstraintDecl | DeclareDecl | DestructureDecl | FnConstraint | FnDecl | PropConstraint | RestParam | VarDecl;
+    readonly $container: Arg | ArrowFnConstraint | ClosedTypeDecl | DeclareClosedTypeDecl | DeclareDecl | DeclareOpenTypeDecl | DeclareTypeExtDecl | DestructureDecl | FnConstraint | FnDecl | OpenTypeDecl | PropConstraint | RestParam | VarDecl;
     readonly $type: 'BinaryConstraint';
     left: PrimaryConstraint;
     operator: '!=' | '<' | '<=' | '>' | '>=';
@@ -260,6 +261,21 @@ export function isBoolLit(item: unknown): item is BoolLit {
     return reflection.isInstance(item, BoolLit.$type);
 }
 
+export interface ClosedTypeDecl extends ConstraintDecl {
+    readonly $type: 'ClosedTypeDecl';
+    constraint: Constraint;
+}
+
+export const ClosedTypeDecl = {
+    $type: 'ClosedTypeDecl',
+    constraint: 'constraint',
+    name: 'name'
+} as const;
+
+export function isClosedTypeDecl(item: unknown): item is ClosedTypeDecl {
+    return reflection.isInstance(item, ClosedTypeDecl.$type);
+}
+
 export type Constraint = ArrowFnConstraint | BinaryConstraint | FnConstraint | ObjectConstraint | WhereConstraint;
 
 export const Constraint = {
@@ -271,15 +287,12 @@ export function isConstraint(item: unknown): item is Constraint {
 }
 
 export interface ConstraintDecl extends langium.AstNode {
-    readonly $container: Program;
-    readonly $type: 'ConstraintDecl';
-    constraint: Constraint;
+    readonly $type: 'ClosedTypeDecl' | 'ConstraintDecl' | 'OpenTypeDecl';
     name: string;
 }
 
 export const ConstraintDecl = {
     $type: 'ConstraintDecl',
-    constraint: 'constraint',
     name: 'name'
 } as const;
 
@@ -287,9 +300,26 @@ export function isConstraintDecl(item: unknown): item is ConstraintDecl {
     return reflection.isInstance(item, ConstraintDecl.$type);
 }
 
+export interface DeclareClosedTypeDecl extends DeclareDecl {
+    readonly $type: 'DeclareClosedTypeDecl';
+    constraint: Constraint;
+}
+
+export const DeclareClosedTypeDecl = {
+    $type: 'DeclareClosedTypeDecl',
+    args: 'args',
+    constraint: 'constraint',
+    name: 'name',
+    path: 'path',
+    return: 'return'
+} as const;
+
+export function isDeclareClosedTypeDecl(item: unknown): item is DeclareClosedTypeDecl {
+    return reflection.isInstance(item, DeclareClosedTypeDecl.$type);
+}
+
 export interface DeclareDecl extends langium.AstNode {
-    readonly $container: Program;
-    readonly $type: 'DeclareDecl';
+    readonly $type: 'DeclareClosedTypeDecl' | 'DeclareDecl' | 'DeclareOpenTypeDecl' | 'DeclareTypeExtDecl';
     args: Array<Arg>;
     constraint?: Constraint;
     name: string;
@@ -308,6 +338,42 @@ export const DeclareDecl = {
 
 export function isDeclareDecl(item: unknown): item is DeclareDecl {
     return reflection.isInstance(item, DeclareDecl.$type);
+}
+
+export interface DeclareOpenTypeDecl extends DeclareDecl {
+    readonly $type: 'DeclareOpenTypeDecl';
+    constraint: Constraint;
+}
+
+export const DeclareOpenTypeDecl = {
+    $type: 'DeclareOpenTypeDecl',
+    args: 'args',
+    constraint: 'constraint',
+    name: 'name',
+    path: 'path',
+    return: 'return'
+} as const;
+
+export function isDeclareOpenTypeDecl(item: unknown): item is DeclareOpenTypeDecl {
+    return reflection.isInstance(item, DeclareOpenTypeDecl.$type);
+}
+
+export interface DeclareTypeExtDecl extends DeclareDecl {
+    readonly $type: 'DeclareTypeExtDecl';
+    constraint: Constraint;
+}
+
+export const DeclareTypeExtDecl = {
+    $type: 'DeclareTypeExtDecl',
+    args: 'args',
+    constraint: 'constraint',
+    name: 'name',
+    path: 'path',
+    return: 'return'
+} as const;
+
+export function isDeclareTypeExtDecl(item: unknown): item is DeclareTypeExtDecl {
+    return reflection.isInstance(item, DeclareTypeExtDecl.$type);
 }
 
 export interface DestructureDecl extends langium.AstNode {
@@ -366,7 +432,7 @@ export function isExprStmt(item: unknown): item is ExprStmt {
 }
 
 export interface FnConstraint extends langium.AstNode {
-    readonly $container: Arg | ArrowFnConstraint | ConstraintDecl | DeclareDecl | DestructureDecl | FnConstraint | FnDecl | PropConstraint | RestParam | VarDecl;
+    readonly $container: Arg | ArrowFnConstraint | ClosedTypeDecl | DeclareClosedTypeDecl | DeclareDecl | DeclareOpenTypeDecl | DeclareTypeExtDecl | DestructureDecl | FnConstraint | FnDecl | OpenTypeDecl | PropConstraint | RestParam | VarDecl;
     readonly $type: 'FnConstraint';
     args: Array<Arg>;
     return?: Constraint;
@@ -588,7 +654,7 @@ export function isNumberLit(item: unknown): item is NumberLit {
 }
 
 export interface ObjectConstraint extends langium.AstNode {
-    readonly $container: Arg | ArrowFnConstraint | ConstraintDecl | DeclareDecl | DestructureDecl | FnConstraint | FnDecl | PropConstraint | RestParam | VarDecl;
+    readonly $container: Arg | ArrowFnConstraint | ClosedTypeDecl | DeclareClosedTypeDecl | DeclareDecl | DeclareOpenTypeDecl | DeclareTypeExtDecl | DestructureDecl | FnConstraint | FnDecl | OpenTypeDecl | PropConstraint | RestParam | VarDecl;
     readonly $type: 'ObjectConstraint';
     props: Array<PropConstraint>;
 }
@@ -600,6 +666,21 @@ export const ObjectConstraint = {
 
 export function isObjectConstraint(item: unknown): item is ObjectConstraint {
     return reflection.isInstance(item, ObjectConstraint.$type);
+}
+
+export interface OpenTypeDecl extends ConstraintDecl {
+    readonly $type: 'OpenTypeDecl';
+    constraint: Constraint;
+}
+
+export const OpenTypeDecl = {
+    $type: 'OpenTypeDecl',
+    constraint: 'constraint',
+    name: 'name'
+} as const;
+
+export function isOpenTypeDecl(item: unknown): item is OpenTypeDecl {
+    return reflection.isInstance(item, OpenTypeDecl.$type);
 }
 
 export interface PostfixExpr extends langium.AstNode {
@@ -821,12 +902,14 @@ export interface TypeName extends langium.AstNode {
     readonly $container: BinaryConstraint | TypeName | WhereConstraint;
     readonly $type: 'TypeName';
     name: string;
+    nullable?: '?';
     params: Array<TypeName>;
 }
 
 export const TypeName = {
     $type: 'TypeName',
     name: 'name',
+    nullable: 'nullable',
     params: 'params'
 } as const;
 
@@ -886,7 +969,7 @@ export function isVarDecl(item: unknown): item is VarDecl {
 }
 
 export interface WhereConstraint extends langium.AstNode {
-    readonly $container: Arg | ArrowFnConstraint | ConstraintDecl | DeclareDecl | DestructureDecl | FnConstraint | FnDecl | PropConstraint | RestParam | VarDecl;
+    readonly $container: Arg | ArrowFnConstraint | ClosedTypeDecl | DeclareClosedTypeDecl | DeclareDecl | DeclareOpenTypeDecl | DeclareTypeExtDecl | DestructureDecl | FnConstraint | FnDecl | OpenTypeDecl | PropConstraint | RestParam | VarDecl;
     readonly $type: 'WhereConstraint';
     primary: PrimaryConstraint;
     where: Array<PropConstraint>;
@@ -930,9 +1013,13 @@ export type ProperLangAstType = {
     BinaryExpr: BinaryExpr
     Block: Block
     BoolLit: BoolLit
+    ClosedTypeDecl: ClosedTypeDecl
     Constraint: Constraint
     ConstraintDecl: ConstraintDecl
+    DeclareClosedTypeDecl: DeclareClosedTypeDecl
     DeclareDecl: DeclareDecl
+    DeclareOpenTypeDecl: DeclareOpenTypeDecl
+    DeclareTypeExtDecl: DeclareTypeExtDecl
     DestructureDecl: DestructureDecl
     DestructureParam: DestructureParam
     Expr: Expr
@@ -952,6 +1039,7 @@ export type ProperLangAstType = {
     NewExpr: NewExpr
     NumberLit: NumberLit
     ObjectConstraint: ObjectConstraint
+    OpenTypeDecl: OpenTypeDecl
     PostfixExpr: PostfixExpr
     PrefixExpr: PrefixExpr
     PrimaryConstraint: PrimaryConstraint
@@ -1092,6 +1180,18 @@ export class ProperLangAstReflection extends langium.AbstractAstReflection {
             },
             superTypes: [Literal.$type]
         },
+        ClosedTypeDecl: {
+            name: ClosedTypeDecl.$type,
+            properties: {
+                constraint: {
+                    name: ClosedTypeDecl.constraint
+                },
+                name: {
+                    name: ClosedTypeDecl.name
+                }
+            },
+            superTypes: [ConstraintDecl.$type]
+        },
         Constraint: {
             name: Constraint.$type,
             properties: {
@@ -1101,14 +1201,33 @@ export class ProperLangAstReflection extends langium.AbstractAstReflection {
         ConstraintDecl: {
             name: ConstraintDecl.$type,
             properties: {
-                constraint: {
-                    name: ConstraintDecl.constraint
-                },
                 name: {
                     name: ConstraintDecl.name
                 }
             },
             superTypes: [TopLevelStmt.$type]
+        },
+        DeclareClosedTypeDecl: {
+            name: DeclareClosedTypeDecl.$type,
+            properties: {
+                args: {
+                    name: DeclareClosedTypeDecl.args,
+                    defaultValue: []
+                },
+                constraint: {
+                    name: DeclareClosedTypeDecl.constraint
+                },
+                name: {
+                    name: DeclareClosedTypeDecl.name
+                },
+                path: {
+                    name: DeclareClosedTypeDecl.path
+                },
+                return: {
+                    name: DeclareClosedTypeDecl.return
+                }
+            },
+            superTypes: [DeclareDecl.$type]
         },
         DeclareDecl: {
             name: DeclareDecl.$type,
@@ -1131,6 +1250,50 @@ export class ProperLangAstReflection extends langium.AbstractAstReflection {
                 }
             },
             superTypes: [TopLevelStmt.$type]
+        },
+        DeclareOpenTypeDecl: {
+            name: DeclareOpenTypeDecl.$type,
+            properties: {
+                args: {
+                    name: DeclareOpenTypeDecl.args,
+                    defaultValue: []
+                },
+                constraint: {
+                    name: DeclareOpenTypeDecl.constraint
+                },
+                name: {
+                    name: DeclareOpenTypeDecl.name
+                },
+                path: {
+                    name: DeclareOpenTypeDecl.path
+                },
+                return: {
+                    name: DeclareOpenTypeDecl.return
+                }
+            },
+            superTypes: [DeclareDecl.$type]
+        },
+        DeclareTypeExtDecl: {
+            name: DeclareTypeExtDecl.$type,
+            properties: {
+                args: {
+                    name: DeclareTypeExtDecl.args,
+                    defaultValue: []
+                },
+                constraint: {
+                    name: DeclareTypeExtDecl.constraint
+                },
+                name: {
+                    name: DeclareTypeExtDecl.name
+                },
+                path: {
+                    name: DeclareTypeExtDecl.path
+                },
+                return: {
+                    name: DeclareTypeExtDecl.return
+                }
+            },
+            superTypes: [DeclareDecl.$type]
         },
         DestructureDecl: {
             name: DestructureDecl.$type,
@@ -1359,6 +1522,18 @@ export class ProperLangAstReflection extends langium.AbstractAstReflection {
             },
             superTypes: [Constraint.$type]
         },
+        OpenTypeDecl: {
+            name: OpenTypeDecl.$type,
+            properties: {
+                constraint: {
+                    name: OpenTypeDecl.constraint
+                },
+                name: {
+                    name: OpenTypeDecl.name
+                }
+            },
+            superTypes: [ConstraintDecl.$type]
+        },
         PostfixExpr: {
             name: PostfixExpr.$type,
             properties: {
@@ -1508,6 +1683,9 @@ export class ProperLangAstReflection extends langium.AbstractAstReflection {
             properties: {
                 name: {
                     name: TypeName.name
+                },
+                nullable: {
+                    name: TypeName.nullable
                 },
                 params: {
                     name: TypeName.params,

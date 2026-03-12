@@ -1,8 +1,11 @@
 declare global const process: Process;
 
-type Process = {
-  env: Record{string, string},
+declare global type Process = {
+  env: Record{Envars, string?},
   argv: string[] where {
     length: number > 2,
   },
 };
+
+/// Convenience type for overriding available environment variable keys.
+declare global type Envars < string;

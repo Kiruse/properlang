@@ -6,7 +6,7 @@ type Window = {
   // is equivalent to
   alert: fn(msg: string) -> void,
   confirm: (msg: string) -> boolean,
-  crypto: SubtleCrypto,
+  crypto: WebCrypto,
 };
 
-type SubtleCrypto = unknown;
+type WebCrypto = unknown;

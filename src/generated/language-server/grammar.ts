@@ -261,12 +261,26 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
         "$type": "TerminalGroup",
         "elements": [
           {
-            "$type": "CharacterRange",
-            "left": {
-              "$type": "Keyword",
-              "value": "///"
-            },
-            "parenthesized": false
+            "$type": "TerminalAlternatives",
+            "elements": [
+              {
+                "$type": "CharacterRange",
+                "left": {
+                  "$type": "Keyword",
+                  "value": "///"
+                },
+                "parenthesized": false
+              },
+              {
+                "$type": "CharacterRange",
+                "left": {
+                  "$type": "Keyword",
+                  "value": "//!"
+                },
+                "parenthesized": false
+              }
+            ],
+            "parenthesized": true
           },
           {
             "$type": "RegexToken",
@@ -1067,6 +1081,165 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
                 "value": ";"
               }
             ]
+          },
+          {
+            "$type": "Group",
+            "elements": [
+              {
+                "$type": "Keyword",
+                "value": "declare"
+              },
+              {
+                "$type": "Keyword",
+                "value": "global"
+              },
+              {
+                "$type": "Keyword",
+                "value": "type"
+              },
+              {
+                "$type": "Assignment",
+                "feature": "name",
+                "operator": "=",
+                "terminal": {
+                  "$type": "RuleCall",
+                  "rule": {
+                    "$ref": "#/rules@0"
+                  },
+                  "arguments": []
+                }
+              },
+              {
+                "$type": "Alternatives",
+                "elements": [
+                  {
+                    "$type": "Group",
+                    "elements": [
+                      {
+                        "$type": "Action",
+                        "inferredType": {
+                          "$type": "InferredType",
+                          "name": "DeclareClosedTypeDecl"
+                        }
+                      },
+                      {
+                        "$type": "Keyword",
+                        "value": "="
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "Group",
+                    "elements": [
+                      {
+                        "$type": "Action",
+                        "inferredType": {
+                          "$type": "InferredType",
+                          "name": "DeclareOpenTypeDecl"
+                        }
+                      },
+                      {
+                        "$type": "Keyword",
+                        "value": "<"
+                      }
+                    ]
+                  },
+                  {
+                    "$type": "Group",
+                    "elements": [
+                      {
+                        "$type": "Action",
+                        "inferredType": {
+                          "$type": "InferredType",
+                          "name": "DeclareTypeExtDecl"
+                        }
+                      },
+                      {
+                        "$type": "Keyword",
+                        "value": "|="
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "$type": "Assignment",
+                "feature": "constraint",
+                "operator": "=",
+                "terminal": {
+                  "$type": "RuleCall",
+                  "rule": {
+                    "$ref": "#/rules@45"
+                  },
+                  "arguments": []
+                }
+              },
+              {
+                "$type": "Keyword",
+                "value": ";"
+              }
+            ]
+          },
+          {
+            "$type": "Group",
+            "elements": [
+              {
+                "$type": "Keyword",
+                "value": "declare"
+              },
+              {
+                "$type": "Keyword",
+                "value": "type"
+              },
+              {
+                "$type": "Assignment",
+                "feature": "name",
+                "operator": "=",
+                "terminal": {
+                  "$type": "RuleCall",
+                  "rule": {
+                    "$ref": "#/rules@0"
+                  },
+                  "arguments": []
+                }
+              },
+              {
+                "$type": "Keyword",
+                "value": "|="
+              },
+              {
+                "$type": "Assignment",
+                "feature": "constraint",
+                "operator": "=",
+                "terminal": {
+                  "$type": "RuleCall",
+                  "rule": {
+                    "$ref": "#/rules@45"
+                  },
+                  "arguments": []
+                }
+              },
+              {
+                "$type": "Keyword",
+                "value": "in"
+              },
+              {
+                "$type": "Assignment",
+                "feature": "path",
+                "operator": "=",
+                "terminal": {
+                  "$type": "RuleCall",
+                  "rule": {
+                    "$ref": "#/rules@43"
+                  },
+                  "arguments": []
+                }
+              },
+              {
+                "$type": "Keyword",
+                "value": ";"
+              }
+            ]
           }
         ]
       },
@@ -1097,8 +1270,41 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
             }
           },
           {
-            "$type": "Keyword",
-            "value": "="
+            "$type": "Alternatives",
+            "elements": [
+              {
+                "$type": "Group",
+                "elements": [
+                  {
+                    "$type": "Action",
+                    "inferredType": {
+                      "$type": "InferredType",
+                      "name": "ClosedTypeDecl"
+                    }
+                  },
+                  {
+                    "$type": "Keyword",
+                    "value": "="
+                  }
+                ]
+              },
+              {
+                "$type": "Group",
+                "elements": [
+                  {
+                    "$type": "Action",
+                    "inferredType": {
+                      "$type": "InferredType",
+                      "name": "OpenTypeDecl"
+                    }
+                  },
+                  {
+                    "$type": "Keyword",
+                    "value": "<"
+                  }
+                ]
+              }
+            ]
           },
           {
             "$type": "Assignment",
@@ -3660,6 +3866,16 @@ export const ProperLangGrammar = (): Grammar => loadedProperLangGrammar ?? (load
                 "value": "}"
               }
             ],
+            "cardinality": "?"
+          },
+          {
+            "$type": "Assignment",
+            "feature": "nullable",
+            "operator": "=",
+            "terminal": {
+              "$type": "Keyword",
+              "value": "?"
+            },
             "cardinality": "?"
           }
         ]

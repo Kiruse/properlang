@@ -132,6 +132,87 @@ import * as Name from 'module';
 import types from 'module';
 ```
 
+## Type Declarations
+
+The `declare` keyword indicates that a definition originates from outside the current package.
+
+### Closed Types
+
+Closed types cannot be refined by dependent packages:
+
+```properlang
+type Window = {
+  alert: fn(msg: string),
+  crypto: SubtleCrypto,
+};
+```
+
+### Open Types
+
+Open types use `<` instead of `=` and can be refined by packages that depend on this one:
+
+```properlang
+// In a registry package:
+type RegistryKey < string;
+```
+
+Dependent packages can then extend the type:
+
+```properlang
+// In a package that depends on the registry:
+declare type RegistryKey |= 'user' | 'product' | 'order' in 'my-registry';
+```
+
+This pattern is useful for generic registries where dependent packages register specific keys.
+
+### Declare Global Type
+
+Declare types in the global scope, typically for runtime-provided values:
+
+```properlang
+// Closed global type
+declare global type JSON = {
+  parse: (text: string) -> any,
+  stringify: (value: any) -> string,
+};
+
+// Open global type
+declare global type EventName < string;
+
+// Extend a global type
+declare global type EventName |= 'click' | 'hover' | 'focus';
+```
+
+Use `declare global type` for types that exist at runtime and aren't bound to a specific package.
+
+### Declare Type (Module Extension)
+
+Extend types in another package:
+
+```properlang
+declare type Config |= { debug: boolean } in './config';
+declare type Route |= '/home' | '/about' in 'my-router';
+```
+
+## Value Declarations
+
+Declare external values and functions for type checking:
+
+### Global Declarations
+
+```properlang
+declare global const window: Window;
+declare global const document: Document;
+declare global fn alert(msg: string) -> void;
+```
+
+### Module-Scoped Declarations
+
+```properlang
+declare const fs: FileSystem in 'fs';
+declare fn readFile(path: string) -> string in 'fs/promises';
+```
+
 ## Constraints
 
 Type constraints for numeric values:
