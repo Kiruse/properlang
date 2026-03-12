@@ -101,7 +101,7 @@ export type ProperLangKeywordNames =
 export type ProperLangTokenNames = ProperLangTerminalNames | ProperLangKeywordNames;
 
 export interface Accessor extends langium.AstNode {
-    readonly $container: ArrowExpr | AssignExpr | BinaryExpr | Block | FnDecl | ForStmt | IfExpr | MemberCallAccessor | MemberIndexAccessor | PostfixExpr | PrefixExpr | Program | RangeBound | ReturnStmt | TemplateLit | TupleExpr | UnlessExpr | VarDecl | WhileStmt;
+    readonly $container: BinaryExpr | PostfixExpr | PrefixExpr | RangeBound;
     readonly $type: 'Accessor';
     id: 'this' | string;
     members: Array<MemberAccessor>;
@@ -144,7 +144,7 @@ export function isArrayConstraint(item: unknown): item is ArrayConstraint {
 }
 
 export interface ArrowExpr extends langium.AstNode {
-    readonly $container: ArrowExpr | AssignExpr | BinaryExpr | Block | FnDecl | ForStmt | IfExpr | MemberCallAccessor | MemberIndexAccessor | PrefixExpr | Program | ReturnStmt | TemplateLit | TupleExpr | UnlessExpr | VarDecl | WhileStmt;
+    readonly $container: BinaryExpr | PrefixExpr;
     readonly $type: 'ArrowExpr';
     args: Array<Arg>;
     body: Block | Expr;
@@ -177,27 +177,8 @@ export function isArrowFnConstraint(item: unknown): item is ArrowFnConstraint {
     return reflection.isInstance(item, ArrowFnConstraint.$type);
 }
 
-export interface AssignExpr extends langium.AstNode {
-    readonly $container: ArrowExpr | AssignExpr | Block | FnDecl | ForStmt | IfExpr | MemberCallAccessor | MemberIndexAccessor | PrefixExpr | Program | ReturnStmt | TemplateLit | TupleExpr | UnlessExpr | VarDecl | WhileStmt;
-    readonly $type: 'AssignExpr';
-    left: Accessor;
-    op: '%=' | '*=' | '+=' | '-=' | '/=' | '=' | '?=';
-    right: Expr;
-}
-
-export const AssignExpr = {
-    $type: 'AssignExpr',
-    left: 'left',
-    op: 'op',
-    right: 'right'
-} as const;
-
-export function isAssignExpr(item: unknown): item is AssignExpr {
-    return reflection.isInstance(item, AssignExpr.$type);
-}
-
 export interface BigintLit extends langium.AstNode {
-    readonly $container: ArrowExpr | AssignExpr | BinaryConstraint | BinaryExpr | Block | FnDecl | ForStmt | IfExpr | MemberCallAccessor | MemberIndexAccessor | PrefixExpr | Program | ReturnStmt | TemplateLit | TupleExpr | UnlessExpr | VarDecl | WhereConstraint | WhileStmt;
+    readonly $container: BinaryConstraint | BinaryExpr | Block | ForStmt | IfExpr | PrefixExpr | Program | UnlessExpr | WhereConstraint | WhileStmt;
     readonly $type: 'BigintLit';
     value: string;
 }
@@ -231,11 +212,11 @@ export function isBinaryConstraint(item: unknown): item is BinaryConstraint {
 }
 
 export interface BinaryExpr extends langium.AstNode {
-    readonly $container: ArrowExpr | AssignExpr | Block | FnDecl | ForStmt | IfExpr | MemberCallAccessor | MemberIndexAccessor | PrefixExpr | Program | ReturnStmt | TemplateLit | TupleExpr | UnlessExpr | VarDecl | WhileStmt;
+    readonly $container: ArrowExpr | Block | FnDecl | ForStmt | IfExpr | MemberCallAccessor | MemberIndexAccessor | Program | ReturnStmt | TemplateLit | TupleExpr | UnlessExpr | VarDecl | WhileStmt;
     readonly $type: 'BinaryExpr';
-    left: PrimaryExpr;
-    operator: '!=' | '!in' | '!instanceof' | '!is' | '%' | '&&' | '*' | '**' | '+' | '-' | '/' | '<' | '<=' | '==' | '>' | '>=' | 'and' | 'in' | 'instanceof' | 'is' | 'isnt' | 'or' | 'xor' | '||';
-    right: PrimaryExpr;
+    left: UnaryExpr;
+    operator: '!=' | '!in' | '!instanceof' | '!is' | '%' | '%=' | '&&' | '*' | '**' | '*=' | '+' | '+=' | '-' | '-=' | '/' | '/=' | '<' | '<=' | '=' | '==' | '>' | '>=' | '?=' | 'and' | 'in' | 'instanceof' | 'is' | 'isnt' | 'or' | 'xor' | '||';
+    right: UnaryExpr;
 }
 
 export const BinaryExpr = {
@@ -265,7 +246,7 @@ export function isBlock(item: unknown): item is Block {
 }
 
 export interface BoolLit extends langium.AstNode {
-    readonly $container: ArrowExpr | AssignExpr | BinaryConstraint | BinaryExpr | Block | FnDecl | ForStmt | IfExpr | MemberCallAccessor | MemberIndexAccessor | PrefixExpr | Program | ReturnStmt | TemplateLit | TupleExpr | UnlessExpr | VarDecl | WhereConstraint | WhileStmt;
+    readonly $container: BinaryConstraint | BinaryExpr | Block | ForStmt | IfExpr | PrefixExpr | Program | UnlessExpr | WhereConstraint | WhileStmt;
     readonly $type: 'BoolLit';
     value: 'false' | 'true';
 }
@@ -364,7 +345,7 @@ export function isDestructureParam(item: unknown): item is DestructureParam {
     return reflection.isInstance(item, DestructureParam.$type);
 }
 
-export type Expr = AssignExpr | BinaryExpr | PrimaryExpr;
+export type Expr = BinaryExpr;
 
 export const Expr = {
     $type: 'Expr'
@@ -402,7 +383,7 @@ export function isFnConstraint(item: unknown): item is FnConstraint {
 }
 
 export interface FnDecl extends langium.AstNode {
-    readonly $container: ArrowExpr | AssignExpr | BinaryExpr | Block | FnDecl | ForStmt | IfExpr | MemberCallAccessor | MemberIndexAccessor | PrefixExpr | Program | ReturnStmt | TemplateLit | TupleExpr | UnlessExpr | VarDecl | WhileStmt;
+    readonly $container: BinaryExpr | Block | ForStmt | IfExpr | PrefixExpr | Program | UnlessExpr | WhileStmt;
     readonly $type: 'FnDecl';
     args: Array<Arg>;
     body: Block | ExprStmt;
@@ -592,7 +573,7 @@ export function isNewExpr(item: unknown): item is NewExpr {
 }
 
 export interface NumberLit extends langium.AstNode {
-    readonly $container: ArrowExpr | AssignExpr | BinaryConstraint | BinaryExpr | Block | FnDecl | ForStmt | IfExpr | MemberCallAccessor | MemberIndexAccessor | PrefixExpr | Program | ReturnStmt | TemplateLit | TupleExpr | UnlessExpr | VarDecl | WhereConstraint | WhileStmt;
+    readonly $container: BinaryConstraint | BinaryExpr | Block | ForStmt | IfExpr | PrefixExpr | Program | UnlessExpr | WhereConstraint | WhileStmt;
     readonly $type: 'NumberLit';
     value: string;
 }
@@ -622,7 +603,7 @@ export function isObjectConstraint(item: unknown): item is ObjectConstraint {
 }
 
 export interface PostfixExpr extends langium.AstNode {
-    readonly $container: ArrowExpr | AssignExpr | BinaryExpr | Block | FnDecl | ForStmt | IfExpr | MemberCallAccessor | MemberIndexAccessor | PrefixExpr | Program | ReturnStmt | TemplateLit | TupleExpr | UnlessExpr | VarDecl | WhileStmt;
+    readonly $container: BinaryExpr | PrefixExpr;
     readonly $type: 'PostfixExpr';
     op: '++' | '--';
     operand: Accessor;
@@ -639,10 +620,10 @@ export function isPostfixExpr(item: unknown): item is PostfixExpr {
 }
 
 export interface PrefixExpr extends langium.AstNode {
-    readonly $container: ArrowExpr | AssignExpr | BinaryExpr | Block | FnDecl | ForStmt | IfExpr | MemberCallAccessor | MemberIndexAccessor | PrefixExpr | Program | ReturnStmt | TemplateLit | TupleExpr | UnlessExpr | VarDecl | WhileStmt;
+    readonly $container: BinaryExpr | PrefixExpr;
     readonly $type: 'PrefixExpr';
     op: '+' | '++' | '-' | '--';
-    operand: Accessor | Expr;
+    operand: Accessor | UnaryExpr;
 }
 
 export const PrefixExpr = {
@@ -665,7 +646,7 @@ export function isPrimaryConstraint(item: unknown): item is PrimaryConstraint {
     return reflection.isInstance(item, PrimaryConstraint.$type);
 }
 
-export type PrimaryExpr = Accessor | ArrowExpr | FnDecl | IfExpr | Literal | NewExpr | PostfixExpr | PrefixExpr | TupleExpr;
+export type PrimaryExpr = Accessor | ArrowExpr | FnDecl | IfExpr | Literal | NewExpr | TupleExpr;
 
 export const PrimaryExpr = {
     $type: 'PrimaryExpr'
@@ -722,7 +703,7 @@ export function isRangeBound(item: unknown): item is RangeBound {
 }
 
 export interface RangeLit extends langium.AstNode {
-    readonly $container: ArrowExpr | AssignExpr | BinaryConstraint | BinaryExpr | Block | FnDecl | ForStmt | IfExpr | MemberCallAccessor | MemberIndexAccessor | PrefixExpr | Program | ReturnStmt | TemplateLit | TupleExpr | UnlessExpr | VarDecl | WhereConstraint | WhileStmt;
+    readonly $container: BinaryConstraint | BinaryExpr | Block | ForStmt | IfExpr | PrefixExpr | Program | UnlessExpr | WhereConstraint | WhileStmt;
     readonly $type: 'RangeLit';
     max: RangeBound;
     min: RangeBound;
@@ -782,7 +763,7 @@ export function isStmt(item: unknown): item is Stmt {
 }
 
 export interface StringLit extends langium.AstNode {
-    readonly $container: ArrowExpr | AssignExpr | BinaryConstraint | BinaryExpr | Block | DeclareDecl | FnDecl | ForStmt | IfExpr | ImportAllDecl | ImportDecl | ImportTypesDecl | MemberCallAccessor | MemberIndexAccessor | PrefixExpr | Program | ReturnStmt | TemplateLit | TupleExpr | UnlessExpr | VarDecl | WhereConstraint | WhileStmt;
+    readonly $container: BinaryConstraint | BinaryExpr | Block | DeclareDecl | ForStmt | IfExpr | ImportAllDecl | ImportDecl | ImportTypesDecl | PrefixExpr | Program | UnlessExpr | WhereConstraint | WhileStmt;
     readonly $type: 'StringLit';
     value: string;
 }
@@ -797,7 +778,7 @@ export function isStringLit(item: unknown): item is StringLit {
 }
 
 export interface TemplateLit extends langium.AstNode {
-    readonly $container: ArrowExpr | AssignExpr | BinaryConstraint | BinaryExpr | Block | FnDecl | ForStmt | IfExpr | MemberCallAccessor | MemberIndexAccessor | PrefixExpr | Program | ReturnStmt | TemplateLit | TupleExpr | UnlessExpr | VarDecl | WhereConstraint | WhileStmt;
+    readonly $container: BinaryConstraint | BinaryExpr | Block | ForStmt | IfExpr | PrefixExpr | Program | UnlessExpr | WhereConstraint | WhileStmt;
     readonly $type: 'TemplateLit';
     vals: Array<Expr | string>;
 }
@@ -822,7 +803,7 @@ export function isTopLevelStmt(item: unknown): item is TopLevelStmt {
 }
 
 export interface TupleExpr extends langium.AstNode {
-    readonly $container: ArrowExpr | AssignExpr | BinaryExpr | Block | FnDecl | ForStmt | IfExpr | MemberCallAccessor | MemberIndexAccessor | PrefixExpr | Program | ReturnStmt | TemplateLit | TupleExpr | UnlessExpr | VarDecl | WhileStmt;
+    readonly $container: BinaryExpr | PrefixExpr;
     readonly $type: 'TupleExpr';
     exprs: Array<Expr>;
 }
@@ -851,6 +832,16 @@ export const TypeName = {
 
 export function isTypeName(item: unknown): item is TypeName {
     return reflection.isInstance(item, TypeName.$type);
+}
+
+export type UnaryExpr = PostfixExpr | PrefixExpr | PrimaryExpr;
+
+export const UnaryExpr = {
+    $type: 'UnaryExpr'
+} as const;
+
+export function isUnaryExpr(item: unknown): item is UnaryExpr {
+    return reflection.isInstance(item, UnaryExpr.$type);
 }
 
 export interface UnlessExpr extends IfExpr {
@@ -934,7 +925,6 @@ export type ProperLangAstType = {
     ArrayConstraint: ArrayConstraint
     ArrowExpr: ArrowExpr
     ArrowFnConstraint: ArrowFnConstraint
-    AssignExpr: AssignExpr
     BigintLit: BigintLit
     BinaryConstraint: BinaryConstraint
     BinaryExpr: BinaryExpr
@@ -978,6 +968,7 @@ export type ProperLangAstType = {
     TopLevelStmt: TopLevelStmt
     TupleExpr: TupleExpr
     TypeName: TypeName
+    UnaryExpr: UnaryExpr
     UnlessExpr: UnlessExpr
     VarDecl: VarDecl
     WhereConstraint: WhereConstraint
@@ -1042,21 +1033,6 @@ export class ProperLangAstReflection extends langium.AbstractAstReflection {
                 }
             },
             superTypes: [Constraint.$type]
-        },
-        AssignExpr: {
-            name: AssignExpr.$type,
-            properties: {
-                left: {
-                    name: AssignExpr.left
-                },
-                op: {
-                    name: AssignExpr.op
-                },
-                right: {
-                    name: AssignExpr.right
-                }
-            },
-            superTypes: [Expr.$type]
         },
         BigintLit: {
             name: BigintLit.$type,
@@ -1393,7 +1369,7 @@ export class ProperLangAstReflection extends langium.AbstractAstReflection {
                     name: PostfixExpr.operand
                 }
             },
-            superTypes: [PrimaryExpr.$type]
+            superTypes: [UnaryExpr.$type]
         },
         PrefixExpr: {
             name: PrefixExpr.$type,
@@ -1405,7 +1381,7 @@ export class ProperLangAstReflection extends langium.AbstractAstReflection {
                     name: PrefixExpr.operand
                 }
             },
-            superTypes: [PrimaryExpr.$type]
+            superTypes: [UnaryExpr.$type]
         },
         PrimaryConstraint: {
             name: PrimaryConstraint.$type,
@@ -1417,7 +1393,7 @@ export class ProperLangAstReflection extends langium.AbstractAstReflection {
             name: PrimaryExpr.$type,
             properties: {
             },
-            superTypes: [Expr.$type]
+            superTypes: [UnaryExpr.$type]
         },
         Program: {
             name: Program.$type,
@@ -1539,6 +1515,12 @@ export class ProperLangAstReflection extends langium.AbstractAstReflection {
                 }
             },
             superTypes: [ArrayConstraint.$type, PrimaryConstraint.$type]
+        },
+        UnaryExpr: {
+            name: UnaryExpr.$type,
+            properties: {
+            },
+            superTypes: []
         },
         UnlessExpr: {
             name: UnlessExpr.$type,

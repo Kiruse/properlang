@@ -66,28 +66,32 @@ IfExpr: ('if' | {infer UnlessExpr} 'unless') condition=Expr ':'? consequent=Stmt
 ForStmt: 'for' 'let' iterator=ID 'in' collection=Expr ':'? consequent=Stmt;
 WhileStmt: 'while' condition=Expr ':'? consequent=Stmt;
 
-Expr: AssignExpr | BinaryExpr | PrimaryExpr;
-AssignExpr: left=Accessor op=('=' | '+=' | '-=' | '*=' | '/=' | '%=' | '?=') right=Expr;
-infix BinaryExpr on PrimaryExpr:
-    right assoc '**'
-  > '*' | '/' | '%'
-  > '+' | '-'
-  > '<' | '<=' | '>' | '>=' | '==' | '!='
-  > right assoc 'in' | 'is' | '!is' | 'isnt' | '!in' | 'instanceof' | '!instanceof'
+Expr: BinaryExpr;
+
+infix BinaryExpr on UnaryExpr:
+    right assoc '=' | '+=' | '-=' | '*=' | '/=' | '%=' | '?='
   > 'or' | 'xor' | 'and' | '&&' | '||'
+  > right assoc 'in' | 'is' | '!is' | 'isnt' | '!in' | 'instanceof' | '!instanceof'
+  > '<' | '<=' | '>' | '>=' | '==' | '!='
+  > '+' | '-'
+  > '*' | '/' | '%'
+  > right assoc '**'
   ;
-PrefixExpr: op=('+'|'-') operand=Expr | op=('++'|'--') operand=Accessor;
-PostfixExpr: operand=Accessor op=('++'|'--');
+
+UnaryExpr:
+    {infer PrefixExpr} op=('++'|'--') operand=Accessor
+  | {infer PrefixExpr} op=('+'|'-') operand=UnaryExpr
+  | {infer PostfixExpr} operand=Accessor op=('++'|'--')
+  | PrimaryExpr
+  ;
+
 PrimaryExpr:
     FnDecl
   | {infer ArrowExpr} '(' (args+=Arg (',' args+=Arg)* ','?)? ')' '=>' body=(Expr | Block)
-    // JS "tuples", i.e. execute all exprs and return the last one
   | {infer TupleExpr} '(' exprs+=Expr (',' exprs+=Expr)* ')'
   | {infer NewExpr} 'new' Accessor
   | IfExpr
   | Literal
-  | PrefixExpr
-  | PostfixExpr
   | Accessor
   ;
 
@@ -131,7 +135,7 @@ Constraint:
 PropConstraint: name=ID ':' constraint=Constraint;
 ArrowFnConstraint: '(' args+=Arg* ')' '->' return=Constraint;
 FnConstraint: 'fn' '(' args+=Arg* ')' ('->' return=Constraint)?;
-WhereConstraint: primary=PrimaryConstraint ('where' '{' (where+=PropConstraint (',' where+=PropConstraint)*)? ','? '}')?;
+WhereConstraint: primary=PrimaryConstraint 'where' '{' (where+=PropConstraint (',' where+=PropConstraint)*)? ','? '}';
 infix BinaryConstraint on PrimaryConstraint:
     '<=' | '<' | '>' | '>='
   > '!=';

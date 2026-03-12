@@ -38,7 +38,7 @@ describe('ProperLang Parser', () => {
         const stmts = (result.value as any).stmts;
         const stmt = stmts[0];
         expect(stmt.name).toBe('x');
-        expect(stmt.value?.value?.$type).toBe('TemplateLit');
+        expect(stmt.value?.$type).toBe('TemplateLit');
       });
 
       test('parses template with multiple interpolations', () => {
@@ -47,7 +47,7 @@ describe('ProperLang Parser', () => {
 
         const stmts = (result.value as any).stmts;
         const stmt = stmts[0];
-        const vals = stmt.value?.value?.vals;
+        const vals = stmt.value?.vals;
         expect(vals.length).toBe(5);
       });
     });
@@ -64,14 +64,14 @@ describe('ProperLang Parser', () => {
 
         const stmts = (result.value as any).stmts;
         const stmt = stmts[0];
-        const templateLit = stmt.value?.value;
+        const templateLit = stmt.value;
 
         expect(templateLit.$type).toBe('TemplateLit');
         expect(templateLit.vals.length).toBe(3);
         expect(typeof templateLit.vals[0]).toBe('string');
         expect(typeof templateLit.vals[1]).toBe('object');
         expect(typeof templateLit.vals[2]).toBe('string');
-        expect(templateLit.vals[1].$type).toBe('AccessorExpr');
+        expect(templateLit.vals[1].$type).toBe('Accessor');
       });
     });
 
