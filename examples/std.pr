@@ -1,0 +1,46 @@
+//! ProperLang standard library, consisting mostly of general purpose traits.
+
+// Tryable is a built-in trait as it cannot be defined within the syntax of ProperLang
+// and is designed as a bridge between Proper world & Vanilla JS, but effectively it
+// looks like this:
+// trait Tryable > (...args: Args) -> Ret where Args < unknown[], Ret {
+//   fn try(...args: Args) -> Ret ! unknown {
+//     try {
+//       return ok(this(...args));
+//     } catch (error) {
+//       return err(error);
+//     }
+//   }
+// }
+
+declare global type Ok{T}  = { ok: T };
+declare global type Err{E} = { err: E };
+
+// All STD traits are auto-`use`d
+trait Result > Ok{T} | Err{E}
+  where T, E
+{
+  fn catch(defaultValue: T | (err: E) -> T) {
+    if this is Ok:
+      return this.ok;
+    if defaultValue is Function:
+      return defaultValue(this.err);
+    return defaultValue;
+  }
+
+  fn map(
+    mapOk:  (value: T) -> T2 = identity,
+    mapErr: (err: E)   -> E2 = identity,
+  ) where T2, E2 {
+    return if this is Ok:
+      ok(mapOk(this.ok));
+    else:
+      err(mapErr(this.err));
+  }
+}
+
+declare global const ok:  (ok: T)  -> { ok: T }  where T;
+declare global const err: (err: E) -> { err: E } where E;
+
+fn identity(value: T) where T:
+  return value;

@@ -24,7 +24,9 @@ TopLevelStmt:
     Stmt
   | DeclareDecl
   | ConstraintDecl
-  | ImportDecl;
+  | ImportDecl
+  | TraitDecl
+  | UseDecl;
 
 Stmt:
     FnDecl
@@ -32,10 +34,9 @@ Stmt:
   | IfExpr
   | ForStmt
   | WhileStmt
-  | ReturnStmt
+  | ReturnStmt ';'?
   | Block
   | Expr ';'
-  | Literal ';'
   ;
 
 ImportDecl:
@@ -53,20 +54,19 @@ DeclareDecl:
   | 'declare' 'global' 'fn' name=ID '(' args+=Arg* ')' '->' return=Constraint ';'
   | 'declare' 'const' name=ID ':' constraint=Constraint 'in' path=StringLit ';'
   | 'declare' 'fn' name=ID '(' args+=Arg* ')' '->' return=Constraint 'in' path=StringLit ';'
-  | 'declare' 'global' 'type' name=ID
+  | 'declare' 'global' 'type' name=ID ('{' typeParams+=ID (',' typeParams+=ID)* ','? '}')?
     ({infer DeclareClosedTypeDecl} '=' | {infer DeclareOpenTypeDecl} '<' | {infer DeclareTypeExtDecl} '|=')
     constraint=Constraint ';'
   | 'declare' 'type' name=ID '|=' constraint=Constraint 'in' path=StringLit ';'
   ;
 
 ConstraintDecl:
-    'type' name=ID
+    'type' name=ID ('{' typeParams+=ID (',' typeParams+=ID)* ','? '}')?
     ({infer ClosedTypeDecl} '=' | {infer OpenTypeDecl} '<')
     constraint=Constraint ';';
 
 Block: '{' stmts+=Stmt* '}';
-ExprStmt: Expr ';';
-ReturnStmt: 'return' value=Expr? ';';
+ReturnStmt: 'return' value=Expr?;
 
 IfExpr: ('if' | {infer UnlessExpr} 'unless') condition=Expr ':'? consequent=Stmt ('else' ':'? alternate=Stmt)?;
 
@@ -77,24 +77,27 @@ Expr: BinaryExpr;
 
 infix BinaryExpr on UnaryExpr:
     right assoc '=' | '+=' | '-=' | '*=' | '/=' | '%=' | '?='
-  > 'or' | 'xor' | 'and' | '&&' | '||'
-  > right assoc 'in' | 'is' | '!is' | 'isnt' | '!in' | 'instanceof' | '!instanceof'
-  > '<' | '<=' | '>' | '>=' | '==' | '!='
+  > right assoc 'in' | '!in' | 'is' | '!is'
+  > right assoc '**'
   > '+' | '-'
   > '*' | '/' | '%'
-  > right assoc '**'
+  > '<' | '<=' | '>' | '>=' | '==' | '!='
+  > 'and' | '&&' | '&'
+  > 'or' | 'xor' | '||' | '|'
   ;
 
 UnaryExpr:
     {infer PrefixExpr} op=('++'|'--') operand=Accessor
-  | {infer PrefixExpr} op=('+'|'-') operand=UnaryExpr
+  | {infer PrefixExpr} op=('+'|'-'|'!'|'~') operand=UnaryExpr
   | {infer PostfixExpr} operand=Accessor op=('++'|'--')
   | PrimaryExpr
   ;
 
 PrimaryExpr:
     FnDecl
-  | {infer ArrowExpr} '(' (args+=Arg (',' args+=Arg)* ','?)? ')' '=>' body=(Expr | Block)
+  | {infer ArrowExpr} '(' (args+=Arg (',' args+=Arg)* ','?)? ')'
+                      ('where' where+=Param (',' where+=Param)* ','?)?
+                      '=>' body=(Expr | Block)
   | {infer TupleExpr} '(' exprs+=Expr (',' exprs+=Expr)* ')'
   | {infer NewExpr} 'new' Accessor
   | IfExpr
@@ -102,11 +105,16 @@ PrimaryExpr:
   | Accessor
   ;
 
-FnDecl: 'fn' name=ID? '(' (args+=Arg (',' args+=Arg)* ','?)? ')' ('->' return=Constraint)? ':'? body=(ExprStmt | Block);
+FnDecl:
+    'fn' name=ID? '('
+    (args+=Arg (',' args+=Arg)* ','?)?
+    ')' ('->' return=Constraint ('!' error=Constraint)?)?
+    ('where' where+=Param (',' where+=Param)* ','?)? ':'?
+    body=Stmt;
 Arg:
     {infer DestructureParam} '{' (destruct+=DestructureDecl (',' destruct+=DestructureDecl)*)? '}'
   | {infer RestParam} '...' name=ID (':' constraint=Constraint)?
-  | name=ID (':' constraint=Constraint)?;
+  | name=ID (':' constraint=Constraint)? ('=' default=Expr)?;
 
 VarDecl:
     kw='let' name=ID ':' constraint=Constraint ';'
@@ -114,11 +122,27 @@ VarDecl:
   | kw=('let' | 'const') '{' (destruct+=DestructureDecl (',' destruct+=DestructureDecl)*)? '}' '=' value=Expr ';';
 DestructureDecl: name=ID ('as' rename=ID)? (':' constraint=Constraint)?;
 
-Accessor: id=(ID | 'this') members+=MemberAccessor*;
+TraitDecl:
+    'trait' name=ID ('>' supertype=Constraint)?
+    ('where' where+=Param (',' where+=Param)* ','?)?
+    '{' provides+=TraitProp* '}';
+TraitProp:
+    {infer TraitGetterProp} 'get' name=ID '(' ')' ':'? body=Stmt
+  | {infer TraitSetterProp} 'set' name=ID '(' arg=Arg ')' ('where' where+=Param (',' where+=Param)* ','?)? ':'? body=Stmt
+  | {infer TraitMethodProp} 'fn'  name=ID '(' (args+=Arg (',' args+=Arg)* ','?)? ')' ('where' where+=Param (',' where+=Param)* ','?)? ':'? body=Stmt;
+UseDecl: 'use' trait=ID ('as' as=ID)? ';';
+
+Accessor: id=ID members+=MemberAccessor*;
+CallArg:
+    {infer NamedArg} name=ID '=' value=Expr
+  | Expr;
+
 MemberAccessor:
     {infer MemberPropAccessor}  nullish=('?' | '!')? '.' prop=ID
   | {infer MemberIndexAccessor} nullish=('?' | '!')? '[' index=Expr ']'
-  | {infer MemberCallAccessor}  nullish=('?' | '!')? '(' (args+=Expr (',' args+=Expr)*)? ')';
+  | {infer MemberCallAccessor}  nullish=('?' | '!')? '(' (args+=CallArg (',' args+=CallArg)* ','?)? ')';
+
+Param: name=ID ('<' constraint=Constraint)?;
 
 Literal: RangeLit | BigintLit | NumberLit | BoolLit | TemplateLit | StringLit;
 RangeLit: min=RangeBound op=('..' | '...') max=RangeBound;
@@ -134,17 +158,23 @@ TemplateLit:
     vals+=TPL_END;
 
 Constraint:
+    BinaryConstraint
+  | WhereConstraint;
+
+ConstraintOperand:
     {infer ObjectConstraint} '{' (props+=PropConstraint (',' props+=PropConstraint)*)? ','? '}'
   | ArrowFnConstraint
   | FnConstraint
-  | BinaryConstraint
-  | WhereConstraint;
-PropConstraint: name=ID ':' constraint=Constraint;
-ArrowFnConstraint: '(' args+=Arg* ')' '->' return=Constraint;
-FnConstraint: 'fn' '(' args+=Arg* ')' ('->' return=Constraint)?;
+  | PrimaryConstraint;
+
+PropConstraint: name=ID optional='?'? ':' constraint=Constraint;
+ArrowFnConstraint: '(' args+=Arg* ')' '->' return=Constraint ('!' error=Constraint)? ('where' where+=Param (',' where+=Param)* ','?)?;
+FnConstraint: 'fn' '(' args+=Arg* ')' ('->' return=Constraint ('!' error=Constraint)?)? ('where' where+=Param (',' where+=Param)* ','?)?;
 WhereConstraint: primary=PrimaryConstraint 'where' '{' (where+=PropConstraint (',' where+=PropConstraint)*)? ','? '}';
-infix BinaryConstraint on PrimaryConstraint:
-    '<=' | '<' | '>' | '>='
+infix BinaryConstraint on ConstraintOperand:
+    '|'
+  > '&'
+  > '<=' | '<' | '>' | '>='
   > '!=';
 PrimaryConstraint:
     {infer ArrayConstraint} TypeName '[' ']'

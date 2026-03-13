@@ -10,7 +10,7 @@
     },
     {
       "name": "keyword.control.properlang",
-      "match": "(?i)\\b(and|as|const|declare|else|false|fn|for|from|global|if|import|in|instanceof|is|isnt|let|n|new|or|return|this|true|type|types|unless|where|while|xor)\\b|\\B(!in|!instanceof|!is)\\b"
+      "match": "(?i)\\b(and|as|const|declare|else|false|fn|for|from|get|global|if|import|in|is|let|n|new|or|return|set|trait|true|type|types|unless|use|where|while|xor)\\b|\\B(!in|!is)\\b"
     }
   ],
   "repository": {

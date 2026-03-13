@@ -1,12 +1,12 @@
 // Monarch syntax highlighting for the properlang language.
 export default {
     keywords: [
-        '!in','!instanceof','!is','and','as','const','declare','else','false','fn','for','from','global','if','import','in','instanceof','is','isnt','let','n','new','or','return','this','true','type','types','unless','where','while','xor'
+        '!in','!is','and','as','const','declare','else','false','fn','for','from','get','global','if','import','in','is','let','n','new','or','return','set','trait','true','type','types','unless','use','where','while','xor'
     ],
     operators: [
-        '!','!=','%','%=','&&','*','**','*=','+','++','+=',',','-','--','-=','->','.','..','...','/','/=',':',';','<','<=','=','==','=>','>','>=','?','?=','|=','||'
+        '!','!=','%','%=','&','&&','*','**','*=','+','++','+=',',','-','--','-=','->','.','..','...','/','/=',':',';','<','<=','=','==','=>','>','>=','?','?=','|','|=','||','~'
     ],
-    symbols: /!|!=|%|%=|&&|\(|\)|\*|\*\*|\*=|\+|\+\+|\+=|,|-|--|-=|->|\.|\.\.|\.\.\.|\/|\/=|:|;|<|<=|=|==|=>|>|>=|\?|\?=|\[|\]|\{|\|=|\|\||\}/,
+    symbols: /!|!=|%|%=|&|&&|\(|\)|\*|\*\*|\*=|\+|\+\+|\+=|,|-|--|-=|->|\.|\.\.|\.\.\.|\/|\/=|:|;|<|<=|=|==|=>|>|>=|\?|\?=|\[|\]|\{|\||\|=|\|\||\}|~/,
 
     tokenizer: {
         initial: [
