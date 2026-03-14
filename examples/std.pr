@@ -39,6 +39,18 @@ trait Result > Ok{T} | Err{E}
   }
 }
 
+type Thenable = {
+  then: fn(cb: (value: T) -> R) -> Promise{R} where R,
+};
+
+// Like `Tryable`, `Awaitable` is a built-in trait that cannot be directly expressed in
+// ProperLang itself, but it's signature looks like this:
+// trait Awaitable > Thenable{T} where T {
+//   // `await`s the promise & wraps it in a `Result`
+//   // which can then be chained with `Result` trait above
+//   get await() -> T ! unknown;
+// }
+
 declare global const ok:  (ok: T)  -> { ok: T }  where T;
 declare global const err: (err: E) -> { err: E } where E;
 

@@ -6,6 +6,11 @@ terminal HEX:    /0x[0-9a-fA-F]+/;
 terminal OCT:    /0o[0-7]+/;
 terminal BIN:    /0b[01]+/;
 
+hidden terminal DOC_COMMENT: ('///' | '//!') /[^\n]*/ '\n';
+hidden terminal LINE_COMMENT: '//' /[^\n]*/ '\n';
+hidden terminal BLOCK_COMMENT: '/*' .* '*/';
+terminal REGEX:  /\/([^\/\\\\]|\\\\.)*\/[gimsuy]*/;
+
 terminal STRING_SINGLE: /'([^'\\]|\\.)*'/;
 terminal STRING_DOUBLE: /"([^"\\]|\\.)*"/;
 terminal TPL_FULL: '`' /(?:[^$\\]|\\.|\$(?!\{))*/ '`';
@@ -14,14 +19,12 @@ terminal TPL_END: '}' /(?:[^$\\]|\\.|\$(?!\{))*/ '`';
 terminal TPL_BTWN: '}' /(?:[^$\\]|\\.|\$(?!\{))*/ '${';
 
 hidden terminal WS: /\s+/;
-terminal DOC_COMMENT: ('///' | '//!') /[^\n]*/ '\n';
-hidden terminal LINE_COMMENT: '//' /[^\n]*/ '\n';
-hidden terminal BLOCK_COMMENT: '/*' .* '*/';
 
 entry Program: stmts+=TopLevelStmt*;
 
 TopLevelStmt:
     Stmt
+  | ExportDecl
   | DeclareDecl
   | ConstraintDecl
   | ImportDecl
@@ -35,6 +38,9 @@ Stmt:
   | ForStmt
   | WhileStmt
   | ReturnStmt ';'?
+  | {infer ContinueStmt} 'continue' ';'
+  | {infer BreakStmt} 'break' ';'
+  | {infer DeleteStmt} 'delete' Accessor ';'
   | Block
   | Expr ';'
   ;
@@ -48,6 +54,12 @@ ImportDecl:
   | 'import' '{' names+=ID* '}' 'from' path=StringLit ';'
   | 'import' 'from' path=StringLit ';'
   ;
+
+ExportDecl:
+    'export' decl=FnDecl
+  | 'export' decl=VarDecl
+  | 'export' decl=ConstraintDecl
+  | 'export' decl=TraitDecl;
 
 DeclareDecl:
     'declare' 'global' 'const' name=ID ':' constraint=Constraint ';'
@@ -81,6 +93,7 @@ infix BinaryExpr on UnaryExpr:
   > right assoc '**'
   > '+' | '-'
   > '*' | '/' | '%'
+  > '??'
   > '<' | '<=' | '>' | '>=' | '==' | '!='
   > 'and' | '&&' | '&'
   > 'or' | 'xor' | '||' | '|'
@@ -97,16 +110,17 @@ PrimaryExpr:
     FnDecl
   | {infer ArrowExpr} '(' (args+=Arg (',' args+=Arg)* ','?)? ')'
                       ('where' where+=Param (',' where+=Param)* ','?)?
-                      '=>' body=(Expr | Block)
+                      '=>' body=Expr
   | {infer TupleExpr} '(' exprs+=Expr (',' exprs+=Expr)* ')'
   | {infer NewExpr} 'new' Accessor
   | IfExpr
   | Literal
   | Accessor
+  | Block
   ;
 
 FnDecl:
-    'fn' name=ID? '('
+    async='async'? 'fn' name=ID? '('
     (args+=Arg (',' args+=Arg)* ','?)?
     ')' ('->' return=Constraint ('!' error=Constraint)?)?
     ('where' where+=Param (',' where+=Param)* ','?)? ':'?
@@ -144,13 +158,22 @@ MemberAccessor:
 
 Param: name=ID ('<' constraint=Constraint)?;
 
-Literal: RangeLit | BigintLit | NumberLit | BoolLit | TemplateLit | StringLit;
+Literal: ArrayLit | ObjectLit | RangeLit | BigintLit | NumberLit | BoolLit | RegexLit | TemplateLit | StringLit;
+ArrayLit: '[' (exprs+=ArrayElem (',' exprs+=ArrayElem)* ','?)? ']';
+ArrayElem: {infer ArraySpreadElem} '...' expr=Expr | Expr;
+ObjectLit: '{' (props+=ObjectProp (',' props+=ObjectProp)* ','?)? '}';
+ObjectProp:
+    name=ID ':' value=Expr
+  | name=ID
+  | {infer ObjectSpreadProp} '...' expr=Expr
+  | {infer ObjectComputedProp} '[' expr=Expr ']' ':' value=Expr;
 RangeLit: min=RangeBound op=('..' | '...') max=RangeBound;
 RangeBound: value=NUMBER | value=Accessor;
 NumberLit: value=HEX | value=OCT | value=BIN | value=NUMBER;
 BigintLit: value=NUMBER 'n';
 BoolLit: value='true' | value='false';
 StringLit: value=(STRING_SINGLE | STRING_DOUBLE);
+RegexLit: pattern=REGEX;
 TemplateLit:
     vals+=TPL_FULL
   | vals+=TPL_START vals+=Expr
@@ -168,7 +191,7 @@ ConstraintOperand:
   | PrimaryConstraint;
 
 PropConstraint: name=ID optional='?'? ':' constraint=Constraint;
-ArrowFnConstraint: '(' args+=Arg* ')' '->' return=Constraint ('!' error=Constraint)? ('where' where+=Param (',' where+=Param)* ','?)?;
+ArrowFnConstraint: async='async'? '(' args+=Arg* ')' '->' return=Constraint ('!' error=Constraint)? ('where' where+=Param (',' where+=Param)* ','?)?;
 FnConstraint: 'fn' '(' args+=Arg* ')' ('->' return=Constraint ('!' error=Constraint)?)? ('where' where+=Param (',' where+=Param)* ','?)?;
 WhereConstraint: primary=PrimaryConstraint 'where' '{' (where+=PropConstraint (',' where+=PropConstraint)*)? ','? '}';
 infix BinaryConstraint on ConstraintOperand:

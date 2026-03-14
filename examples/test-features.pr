@@ -1,0 +1,24 @@
+const regex1 = /abc/;
+const regex2 = /test/gi;
+const regex3 = /pattern/m;
+
+export fn exportedFn(x: number) {
+  return x * 2;
+}
+
+export const exportedConst = 42;
+
+export type ExportedType = string;
+
+export trait ExportedTrait {
+  fn method() {}
+}
+
+const key = 'computed';
+const obj1 = { [key]: 'value' };
+const obj2 = { [1 + 2]: 'number key' };
+const obj3 = { [getDynamicKey()]: 'dynamic key' };
+
+fn getDynamicKey() {
+  return 'dynamic';
+}

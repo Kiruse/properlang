@@ -1,12 +1,12 @@
 // Monarch syntax highlighting for the properlang language.
 export default {
     keywords: [
-        '!in','!is','and','as','const','declare','else','false','fn','for','from','get','global','if','import','in','is','let','n','new','or','return','set','trait','true','type','types','unless','use','where','while','xor'
+        '!in','!is','and','as','async','break','const','continue','declare','delete','else','export','false','fn','for','from','get','global','if','import','in','is','let','n','new','or','return','set','trait','true','type','types','unless','use','where','while','xor'
     ],
     operators: [
-        '!','!=','%','%=','&','&&','*','**','*=','+','++','+=',',','-','--','-=','->','.','..','...','/','/=',':',';','<','<=','=','==','=>','>','>=','?','?=','|','|=','||','~'
+        '!','!=','%','%=','&','&&','*','**','*=','+','++','+=',',','-','--','-=','->','.','..','...','/','/=',':',';','<','<=','=','==','=>','>','>=','?','?=','??','|','|=','||','~'
     ],
-    symbols: /!|!=|%|%=|&|&&|\(|\)|\*|\*\*|\*=|\+|\+\+|\+=|,|-|--|-=|->|\.|\.\.|\.\.\.|\/|\/=|:|;|<|<=|=|==|=>|>|>=|\?|\?=|\[|\]|\{|\||\|=|\|\||\}|~/,
+    symbols: /!|!=|%|%=|&|&&|\(|\)|\*|\*\*|\*=|\+|\+\+|\+=|,|-|--|-=|->|\.|\.\.|\.\.\.|\/|\/=|:|;|<|<=|=|==|=>|>|>=|\?|\?=|\?\?|\[|\]|\{|\||\|=|\|\||\}|~/,
 
     tokenizer: {
         initial: [
@@ -15,22 +15,26 @@ export default {
             { regex: /0x[0-9a-fA-F]+/, action: {"token":"HEX"} },
             { regex: /0o[0-7]+/, action: {"token":"OCT"} },
             { regex: /0b[01]+/, action: {"token":"BIN"} },
+            { regex: /\/([^\/\\\\]|\\\\.)*\/[gimsuy]*/, action: {"token":"REGEX"} },
             { regex: /'([^'\\]|\\.)*'/, action: {"token":"STRING_SINGLE"} },
             { regex: /"([^"\\]|\\.)*"/, action: {"token":"STRING_DOUBLE"} },
             { regex: /`(?:[^$\\]|\\.|\$(?!\{))*`/, action: {"token":"TPL_FULL"} },
             { regex: /`(?:[^$\\]|\\.|\$(?!\{))*\$\{/, action: {"token":"TPL_START"} },
             { regex: /\}(?:[^$\\]|\\.|\$(?!\{))*`/, action: {"token":"TPL_END"} },
             { regex: /\}(?:[^$\\]|\\.|\$(?!\{))*\$\{/, action: {"token":"TPL_BTWN"} },
-            { regex: /(\/\/\/|\/\/!)[^\n]*\n/, action: {"token":"DOC_COMMENT"} },
             { include: '@whitespace' },
             { regex: /@symbols/, action: { cases: { '@operators': {"token":"operator"}, '@default': {"token":""} }} },
         ],
         whitespace: [
-            { regex: /\s+/, action: {"token":"white"} },
+            { regex: /\/\/\/\/\/!/, action: {"token":"comment","next":"@comment"} },
             { regex: /\/\//, action: {"token":"comment","next":"@comment"} },
             { regex: /\/\*/, action: {"token":"comment","next":"@comment"} },
+            { regex: /\s+/, action: {"token":"white"} },
         ],
         comment: [
+            { regex: /[^/////!]+/, action: {"token":"comment"} },
+            { regex: /\n/, action: {"token":"comment","next":"@pop"} },
+            { regex: /[/////!]/, action: {"token":"comment"} },
             { regex: /[^//]+/, action: {"token":"comment"} },
             { regex: /\n/, action: {"token":"comment","next":"@pop"} },
             { regex: /[//]/, action: {"token":"comment"} },

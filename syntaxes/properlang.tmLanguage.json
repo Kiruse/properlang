@@ -10,12 +10,27 @@
     },
     {
       "name": "keyword.control.properlang",
-      "match": "(?i)\\b(and|as|const|declare|else|false|fn|for|from|get|global|if|import|in|is|let|n|new|or|return|set|trait|true|type|types|unless|use|where|while|xor)\\b|\\B(!in|!is)\\b"
+      "match": "(?i)\\b(and|as|async|break|const|continue|declare|delete|else|export|false|fn|for|from|get|global|if|import|in|is|let|n|new|or|return|set|trait|true|type|types|unless|use|where|while|xor)\\b|\\B(!in|!is)\\b"
     }
   ],
   "repository": {
     "comments": {
       "patterns": [
+        {
+          "name": "comment.block.properlang",
+          "begin": "/////!",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.comment.properlang"
+            }
+          },
+          "end": "\n",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.comment.properlang"
+            }
+          }
+        },
         {
           "name": "comment.block.properlang",
           "begin": "//",
